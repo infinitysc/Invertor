@@ -1,0 +1,60 @@
+<resources>
+
+    <string name="app_name">Invertor</string>
+
+    <string name = "goToScan">Перейти к сканированию</string>
+    <string name = "scan">Scan</string>
+    <string name ="dffd">Ввод ФИО</string>
+    <string name = "departament">Отдел:</string>
+
+    <!-- CardFragment -->
+    <string name = "adress">Адресс</string>
+    <string name = "description">Описание</string>
+    <string name = "serailNumber">Серийный номер</string>
+    <string name = "status">Статус</string>
+    <string name = "user">Пользователь:</string>
+    <string name = "needChange">Необходимо заменить</string>
+    <string name = "cabinet">Кабинет</string>
+    <string name = "serialNumberEdit">Серийный номер</string>
+    <string name = "cabinetEdit">Кабинет</string>
+    <string name = "ps">Примечание</string>
+    <string name = "save">Сохранить</string>
+    <string name = "chooseUserAuto">Выберите пользователя</string>
+    <string name = "oldUser">Текущий сотрудник:</string>
+    <string name = "goToCard">Перейти к карточке техники</string>
+    <string name = "invenNumb">Инвентарный номер:</string>
+
+    <!--CameraFragment-->
+    <string name = "vibUser">Выбранный сотрудник</string>
+    <string name = "userVib">Сотрудник</string>
+    <string name = "value">Отсканированное значение</string>
+    <string name = "valueText">Значение</string>
+    <string name = "torch">фонарик</string>
+
+    <!-- ListChoiceFragment-->
+    <string name = "choiceInvent">Инвентарный номер:</string>
+    <string name = "choiceDescription">Описание</string>
+    <string name = "choiceAdress">Адресc</string>
+    <string name = "right">Продолжить</string>
+
+    <!-- settings_fragment-->
+    <string name = "exportText">Экспорт файла</string>
+    <string name = "importText">Импорт файла</string>
+    <string name = "importButton">Импорт</string>
+    <string name = "exportButton">Экспорт</string>
+
+    <!-- Preference Titles -->
+    <string name="messages_header">Messages</string>
+    <string name="sync_header">Sync</string>
+
+    <!-- Messages Preferences -->
+    <string name="signature_title">Your signature</string>
+    <string name="reply_title">Default reply action</string>
+
+    <!-- Sync Preferences -->
+    <string name="sync_title">Sync email periodically</string>
+    <string name="attachment_title">Download incoming attachments</string>
+    <string name="attachment_summary_on">Automatically download attachments for incoming emails
+    </string>
+    <string name="attachment_summary_off">Only download attachments when manually requested</string>
+</resources>
