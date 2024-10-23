@@ -42,6 +42,7 @@
     <string name = "importText">Импорт файла</string>
     <string name = "importButton">Импорт</string>
     <string name = "exportButton">Экспорт</string>
+    <string name = "importExcelText">Импорт эксель данных</string>
 
     <!-- Preference Titles -->
     <string name="messages_header">Messages</string>

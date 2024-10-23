@@ -124,6 +124,17 @@ class T {
         }
     }
 
+ private fun checkCache() {
+        val cacheDir = context?.cacheDir
+        val list : List<File>? = cacheDir?.listFiles()?.toList()
+        if (list != null && list.isNotEmpty()){
+            list.forEach{
+                if(it.name == "${oldUserName}.json"){
+
+                }
+            }
+        }
+    }
 }
 
     */

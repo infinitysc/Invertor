@@ -3,6 +3,7 @@ package com.build.Invertor.mainModule.Card
 import android.app.AlertDialog
 import android.content.Context
 import android.content.pm.PackageManager
+import android.media.MediaPlayer
 import android.os.Build
 import android.os.Bundle
 import android.os.Environment
@@ -44,6 +45,7 @@ import java.time.format.DateTimeFormatter
  * **/
 class CardFragment : Fragment(){
 
+    private val sound : MediaPlayer by lazy { MediaPlayer.create(requireContext(),R.raw.scanner_beep) }
     private var user : NewUser? = null
     private var card : CardInventory? = null
     private lateinit var serialInputLayoyt : TextInputLayout
@@ -128,6 +130,7 @@ class CardFragment : Fragment(){
         val callback = BarcodeCallback {
             if(it != null){
                 scopeScanner.setTorch(false)
+                sound.start()
                 value = it.text
                 scopeScanner.pause()
                 Toast.makeText(requireContext(),"Успешное сканирование",Toast.LENGTH_SHORT).show()
@@ -254,6 +257,7 @@ class CardFragment : Fragment(){
 
     override fun onDestroy() {
         super.onDestroy()
+        sound.release()
     }
 
     private fun getCacheFileToReWrite(fileNameFromCache : String,card : CardInventory) {
@@ -356,7 +360,7 @@ var Cod1C : String?,*/
         return oldCard
     }
 
-    //вроде работает
+    //оставлю
     private fun saveJson(jsonStr : String , fileName : String = "${user?.user?.id}_${getCurrentTime().replace(":", "-")}.json"){
         if (Environment.getExternalStorageState() == Environment.MEDIA_MOUNTED) {
             val folder = File(activityContext.getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS), "json")

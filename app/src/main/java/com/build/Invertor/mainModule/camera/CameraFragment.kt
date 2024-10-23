@@ -159,21 +159,8 @@ class CameraFragment : Fragment(){
             }
 
         }
-
-
-        /*startCamera(object : callback {
-            override fun onScan(list: List<Barcode>) {
-
-            }
-        })*/
         button.setOnClickListener{
-            /*register.launch(
-                    ScanOptions()
-                        .setOrientationLocked(false)
-                        .setCameraId(0)
-                        .setPrompt("Scan Barcode")
-                        .setDesiredBarcodeFormats(ScanOptions.ALL_CODE_TYPES)
-                )*/
+
             if (jsonDownloader != null) {
                 val card = searcheable(valueString)
                 when {
@@ -268,76 +255,6 @@ class CameraFragment : Fragment(){
             }
         }
         return mutList
-    }
-    //скорее всего перекину в CardFragment чтобы при нажатии кнопки сразу вносили изменение и сделаю так чтобы после возвращения в CameraFragment или в ListChoiceFragment данные обновились
-    private fun newFileIntoInternalStorage(fileName : String = "jso.json",classJson : JsonDownloader) {
-        val gsonEngine = Gson()
-        val listStr = getFileFromCacheDir("${singleList?.user?.id}.json")?.readText()
-        if (listStr != null) {
-            val typeOfList = object : TypeToken<List<CardInventory>>() {}.type
-            val newList = gsonEngine.fromJson<List<CardInventory>>(listStr, typeOfList)
-            val list = classJson.getPairLinkedMap()
-            //first -> InventNumb second -> cod1C
-            val newMutList : MutableList<CardInventory> = mutableListOf()
-            list.forEach{
-                val key = it.key
-                newList.forEach{card : CardInventory ->
-                    if(key.first == card.inventNumb || key.second == card.Cod1C){
-                        it.value.SID = card.SID
-                        it.value.UEID = card.UEID
-                        it.value.UEDescription = card.UEDescription
-                        it.value.ActionDateTime = card.ActionDateTime
-                        it.value.Adress = card.Adress
-                        it.value.Status = card.Status
-                        it.value.inventNumb = card.inventNumb
-                        it.value.SerialNumb = card.SerialNumb
-                        it.value.IsSNEdited = card.IsSNEdited
-                        it.value.UserNаме = card.UserNаме
-                        it.value.Description = card.Description
-                        it.value.Cabinet = card.Cabinet
-                        it.value.Cod1C = card.Cod1C
-                    }
-                }
-                newMutList.add(
-                    CardInventory(
-                    it.value.SID,
-                    it.value.UEID,
-                    it.value.UEDescription ?: "",
-                    it.value.ActionDateTime ?: "",
-                    it.value.Adress ?: "",
-                    it.value.Status ?: "",
-                    it.value.inventNumb ?: "",
-                    it.value.SerialNumb,
-                    it.value.IsSNEdited,
-                    it.value.UserNаме ?: "",
-                    it.value.Description ?: "",
-                    it.value.Cabinet ?: "",
-                    it.value.Cod1C ?: ""
-                    )
-                )
-            }
-            val newJsonString = gsonEngine.toJson(newMutList)
-            try{
-                val outStream = contex.openFileOutput(fileName,Context.MODE_PRIVATE)
-                outStream.write(newJsonString.toByteArray())
-                outStream.close()
-            }
-            catch (e : IOException){
-                Log.e("FILE","FILEEROR")
-            }
-        }
-    }
-
-    private fun getFileFromCacheDir(fileName : String ) : File? {
-        val cacheDir = contex.cacheDir
-        val file = File(cacheDir,fileName)
-        return if(file.exists()){
-            file
-        }
-        else {
-            Log.e("FileError","fileNotFoundException")
-            null
-        }
     }
 
     fun setJson(js : JsonDownloader?)  {

@@ -169,18 +169,6 @@ class StartFragment  : Fragment(){
         }
         return ""
     }
-   private fun checkCache() {
-        val cacheDir = context?.cacheDir
-        val list : List<File>? = cacheDir?.listFiles()?.toList()
-        if (list != null && list.isNotEmpty()){
-            list.forEach{
-                if(it.name == "${oldUserName}.json"){
-
-                }
-            }
-        }
-    }
-
 
     private fun installJsonFile(fileName : String = "jso.json") : JsonDownloader? {
         try {
@@ -229,7 +217,7 @@ class StartFragment  : Fragment(){
         }
     }
     private fun check(reqCode : Int) {
-        if(ContextCompat.checkSelfPermission(cont,android.Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED){
+        if(ContextCompat.checkSelfPermission(cont,android.Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED){ //работает и на 30+ андроиде
             ActivityCompat.requestPermissions(requireActivity(), arrayOf(android.Manifest.permission.CAMERA),reqCode)
         }
         else {
@@ -237,7 +225,7 @@ class StartFragment  : Fragment(){
             if(json != null){
                 val singleUser = searchUser()
                 val newAbsUser = NewUser(singleUser,cabinetEditor.text.toString())
-                if(singleUser != null && (cabinetEditor.text.toString() != "" || cabinetEditor.text.toString() != " " || cabinetEditor.text.toString() != "   ")){
+                if(singleUser != null){
                     val newFragment = CameraFragment.newInstance(newAbsUser, json)
                     Log.d("FragmentReplace","Вызван следующий фрагмент CameraFragment")
                     activityFragmentManager.beginTransaction()
