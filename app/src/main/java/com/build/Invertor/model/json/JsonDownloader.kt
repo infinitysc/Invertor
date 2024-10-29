@@ -1,13 +1,10 @@
 package com.build.Invertor.model.json
 
-import android.content.Context
-import android.provider.MediaStore.Files
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import com.google.gson.reflect.TypeToken
-import java.io.File
 import java.io.InputStream
-import java.nio.charset.Charset
+
 
 /**
  * Класс предназначенный для загрузки json файла из системы Android(пока не реализованно)
@@ -92,4 +89,15 @@ class JsonDownloader(private val path : InputStream) {
     }
     /** Создает пару и если значения равны нулю то возвращает пустую строку **/
     private fun putPair(inventNumber : String?, code : String?) : Pair<String,String> = Pair(inventNumber ?: "", code ?: "")
+
+    fun searchMaxUEID() : Int {
+        var max = 0
+        for(i in list.iterator()){
+            if(i.UEID > max) {
+                max = i.UEID
+            }
+        }
+        return max
+    }
+
 }

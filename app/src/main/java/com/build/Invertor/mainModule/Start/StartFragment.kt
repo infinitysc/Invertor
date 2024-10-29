@@ -10,6 +10,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
 import android.widget.*
+import android.widget.AdapterView.OnItemSelectedListener
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
@@ -22,7 +23,7 @@ import com.build.Invertor.model.csv.DataDownloader
 import com.build.Invertor.model.csv.User
 import com.build.Invertor.model.json.JsonDownloader
 import com.google.android.material.textfield.TextInputEditText
-import java.io.File
+import java.io.*
 
 
 /**
@@ -54,31 +55,32 @@ class StartFragment  : Fragment(){
 
     private var data : DataDownloader? = null
     private var json : JsonDownloader? = null
-
     private val TagUser = "User"
-
+    private var spinAdr = ""
     private lateinit var imageButtton : ImageButton
     private lateinit var searchEditText : AutoCompleteTextView
     private lateinit var button : Button
     private lateinit var cabinetEditor : TextInputEditText
-    lateinit var cont : Context
-    private val activityFragmentManager : FragmentManager by lazy { activity?.supportFragmentManager!! }
     private lateinit var departament : TextView
-    private val assetManager : AssetManager? by lazy { activity?.assets }
+    private lateinit var adressSpinner : Spinner
+
+    private val activityFragmentManager : FragmentManager by lazy { activity?.supportFragmentManager!! }
+
     private val list : List<User>? by lazy {
       data?.getList()
     }
-    private var oldUserName : String = ""
-    private var oldUserID : Int = 0
-
-    override fun onAttach(context: Context) {
-        cont = context
-        super.onAttach(context)
+    private val listStr : List<String> by lazy {
+        txtToList(requireContext().assets.open("iDAdress.txt"))
     }
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-
+    private fun txtToList(input : InputStream) : List<String> {
+        return try {
+            BufferedReader(InputStreamReader(input)).use { reader ->
+                reader.lineSequence().toList()
+            }
+        } catch (e : IOException){
+            e.printStackTrace()
+            listOf<String>()
+        }
     }
 
     private fun searchData() {
@@ -114,6 +116,10 @@ class StartFragment  : Fragment(){
         imageButtton = view.findViewById(R.id.imageButton)
         cabinetEditor = view.findViewById(R.id.cabinetEdit)
 
+        adressSpinner = view.findViewById(R.id.adressSpinner)
+
+        val adapter = ArrayAdapter(requireContext(),R.layout.spinner,listStr)
+        adressSpinner.adapter = adapter
     }
 
     override fun onStart() {
@@ -121,7 +127,7 @@ class StartFragment  : Fragment(){
 
         searchData()
         if(data != null){
-            val array : ArrayAdapter<String> = ArrayAdapter(cont,R.layout.spinner,createListUserName(data!!))
+            val array : ArrayAdapter<String> = ArrayAdapter(requireContext(),R.layout.spinner,createListUserName(data!!))
             searchEditText.setAdapter(array)
             Toast.makeText(requireContext()," Данные с пользователями загружены",Toast.LENGTH_SHORT).show()
             Log.d("FileWork","excel data загружена в внутренее хранилище $this")
@@ -130,6 +136,23 @@ class StartFragment  : Fragment(){
             Toast.makeText(requireContext(),"Загрузите данные с пользователями",Toast.LENGTH_SHORT).show()
             Log.d("FileWork","Excel data не загружена во внутреннее хранилище $this")
         }
+
+
+        adressSpinner.onItemSelectedListener = object : OnItemSelectedListener {
+            override fun onItemSelected(
+                parent: AdapterView<*>?,
+                view: View?,
+                position: Int,
+                id: Long
+            ) {
+                spinAdr = listStr[position]
+            }
+
+            override fun onNothingSelected(parent: AdapterView<*>?) {
+
+            }
+        }
+
         searchEditText.setOnClickListener {
             searchEditText.setText("")
         }
@@ -172,7 +195,7 @@ class StartFragment  : Fragment(){
 
     private fun installJsonFile(fileName : String = "jso.json") : JsonDownloader? {
         try {
-            val inputStream = cont.openFileInput(fileName)
+            val inputStream = requireContext().openFileInput(fileName)
             return JsonDownloader(inputStream)
         }  catch (e : Exception){
             e.printStackTrace()
@@ -217,14 +240,15 @@ class StartFragment  : Fragment(){
         }
     }
     private fun check(reqCode : Int) {
-        if(ContextCompat.checkSelfPermission(cont,android.Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED){ //работает и на 30+ андроиде
+        if(ContextCompat.checkSelfPermission(requireContext(),android.Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED){ //работает и на 30+ андроиде
             ActivityCompat.requestPermissions(requireActivity(), arrayOf(android.Manifest.permission.CAMERA),reqCode)
         }
         else {
             json = installJsonFile()
             if(json != null){
+                this.cacheMax()
                 val singleUser = searchUser()
-                val newAbsUser = NewUser(singleUser,cabinetEditor.text.toString())
+                val newAbsUser = NewUser(singleUser,cabinetEditor.text.toString(),spinAdr)
                 if(singleUser != null){
                     val newFragment = CameraFragment.newInstance(newAbsUser, json)
                     Log.d("FragmentReplace","Вызван следующий фрагмент CameraFragment")
@@ -243,6 +267,17 @@ class StartFragment  : Fragment(){
         }
     }
 
+    private fun cacheMax() {
+        val max = json?.searchMaxUEID()
+        val file = File(requireContext().cacheDir,"max.txt")
+        if(max != null){
+            FileWriter(file).use{write ->
+                write.write(max.toString())
+                write.flush()
+            }
+        }
+
+    }
 
     companion object {
         fun newInstance(

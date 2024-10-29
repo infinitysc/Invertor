@@ -57,22 +57,11 @@ class CameraFragment : Fragment(){
     private var jsonDownloader: JsonDownloader? = null
     private var valueString : String = "defaultStringValue"
     private val formats = listOf(
-        //BarcodeFormat.QR_CODE,
         BarcodeFormat.CODE_39,
         BarcodeFormat.CODE_128,
         BarcodeFormat.CODE_93,
         BarcodeFormat.EAN_13,
         BarcodeFormat.EAN_8,
-       // BarcodeFormat.AZTEC,
-       // BarcodeFormat.CODABAR,
-       // BarcodeFormat.DATA_MATRIX,
-      //  BarcodeFormat.ITF,
-     //   BarcodeFormat.MAXICODE,
-     //   BarcodeFormat.RSS_14,
-     //   BarcodeFormat.RSS_EXPANDED,
-     //   BarcodeFormat.UPC_A,
-      //  BarcodeFormat.UPC_E,
-      //  BarcodeFormat.UPC_EAN_EXTENSION
     )
     private val activityFragmentManager : FragmentManager by lazy { activity?.supportFragmentManager!! }
     private val listInCode : List<String> by lazy  {jsonDownloader?.getListCode()!!}

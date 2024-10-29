@@ -57,6 +57,7 @@ class CardFragment : Fragment(){
     private lateinit var userWidget : TextView
     private lateinit var ps : TextInputEditText
     private lateinit var saveButton : Button
+    private lateinit var dependencyButton : Button
     private var saveJsonString : String = ""
     private var saveCard : CardInventory? = null
     private var itemSelected : String = ""
@@ -90,7 +91,7 @@ class CardFragment : Fragment(){
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        //Зона где находим вьюшки
+
         adress = view.findViewById(R.id.adress)
         dest = view.findViewById(R.id.description)
         sNEditor = view.findViewById(R.id.serialNumberEdit)
@@ -101,14 +102,16 @@ class CardFragment : Fragment(){
         oldUser = view.findViewById(R.id.oldUser)
         inventNumb = view.findViewById(R.id.invenNumb)
         serialInputLayoyt = view.findViewById(R.id.serialNimberEditLayout)
+        dependencyButton = view.findViewById(R.id.dependencyButton)
 
-        //подключаем все что нужно
-        val arrayAdapter = ArrayAdapter(activityContext,R.layout.spinner,listSpin)
-        spinnerStatus.adapter = arrayAdapter
-        val deffaultPos = listSpin.indexOf(card?.Status)
-        spinnerStatus.setSelection(deffaultPos)
+        spinnerStatus.adapter = ArrayAdapter(activityContext,R.layout.spinner,listSpin)
+
+        spinnerStatus.setSelection(listSpin.indexOf(card?.Status))
+
         sNEditor.setText(card?.SerialNumb)
+
         ps.setText(card?.Description)
+
         try {
             nameFile = this.requireArguments().getString("json").toString()
         }catch (e : java.lang.IllegalStateException){
@@ -238,7 +241,7 @@ class CardFragment : Fragment(){
                         "${getCurrentTime()}+03",
                         status = itemSelected,
                         change = change,
-                        cabinet = this.user!!.cabinet.toString(), // заглушка
+                        cabinet = this.user!!.cabinet.toString(),
                         ps = ps.text.toString()
                     )
                     val gson = Gson()
@@ -252,6 +255,46 @@ class CardFragment : Fragment(){
                 }
             }
         }
+        dependencyButton.setOnClickListener() {
+            /**
+             * что передаем в baby
+             * sid +
+             * ueid to parentEqueipment+
+             * ueDesc -
+             * actionDateTime -
+             * adress +
+             * status -
+             * invent +
+             * serial -
+             * isSNedited -
+             * userName +
+             * desc -
+             * cabinet +
+             * cod1c +
+             *
+             * */
+            var change = 0
+            oldSnNumber = sNEditor.text.toString()
+            if(oldSnNumber != ""){
+                change = 1
+            }
+            val papaCard = createEditedCard(
+                user = this.user!!,
+                card = this.card,
+                newSerialNumberString = sNEditor.text.toString(),
+                "${getCurrentTime()}+03",
+                status = itemSelected,
+                change = change,
+                cabinet = this.user!!.cabinet.toString(),
+                ps = ps.text.toString()
+            )
+            requireActivity().supportFragmentManager.beginTransaction()
+                .replace(R.id.mainFrameLayout,BabyCardFragment.newInstance(papaCard,this.user!!))
+                .addToBackStack("dependency_Card")
+                .commit()
+
+        }
+
 
     }
 
@@ -405,7 +448,7 @@ var Cod1C : String?,*/
             card.UEID,
             card.UEDescription,
             date,
-            card.Adress ,
+            user.adress ,
             status,
             card.inventNumb,
             newSerialNumberString,
