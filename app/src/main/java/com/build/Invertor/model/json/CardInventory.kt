@@ -15,4 +15,5 @@ data class CardInventory(
     var Description : String?,
     var Cabinet : String?,
     var Cod1C : String?,
+    var parentEqueipment : Int,
 )

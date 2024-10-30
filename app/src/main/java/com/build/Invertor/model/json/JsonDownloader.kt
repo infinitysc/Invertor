@@ -1,8 +1,12 @@
 package com.build.Invertor.model.json
 
+import android.content.Context
+import android.util.Log
+
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import com.google.gson.reflect.TypeToken
+import java.io.File
 import java.io.InputStream
 
 
@@ -32,7 +36,7 @@ class JsonDownloader(private val path : InputStream) {
         val typeOfList = object : TypeToken<List<CardInventory>>() {}.type
         list = gson.fromJson(jsonString,typeOfList)
         linkedMap = createLink(this.list)
-        pairLinkedMap = createDoubleLink(this.list)
+        pairLinkedMap = createDoubleLink()
         listCod1cInvent = createListPair(this.list).toList()
     }
 
@@ -69,14 +73,43 @@ class JsonDownloader(private val path : InputStream) {
 
     fun getPairLinkedMap() : Map<Pair<String,String>, CardInventory> = this.pairLinkedMap
     /**создает "связанный" список(map) в виде Pair<inventNumb,cod1C>(пара инвентарного номера и кода 1с) -> CardInventory**/
-    private fun createDoubleLink(list : List<CardInventory>) : Map<Pair<String,String>, CardInventory> {
+    private fun createDoubleLink() : Map<Pair<String,String>, CardInventory> {
         val startPairLinkerMap = mutableMapOf<Pair<String,String>, CardInventory>()
 
+        var lists : MutableList<CardInventory> = mutableListOf()
         for(card in list.iterator()){
-            startPairLinkerMap.put(putPair(card.inventNumb,card.Cod1C),card)
+
+            startPairLinkerMap[Pair(card.inventNumb ?: "", card.Cod1C ?: "")] = card
+        }
+
+        Log.d("debugPairLinkedMap","$lists")
+        return startPairLinkerMap
+    }
+     fun exp_createDoubleLink(): Map<Pair<String,String>, MutableList<CardInventory>> {
+        val startPairLinkerMap = mutableMapOf<Pair<String,String>, MutableList<CardInventory>>()
+
+
+        for(card in list.iterator()){
+           addToMap(startPairLinkerMap,Pair(card.inventNumb ?:"",card.Cod1C ?:""),card)
         }
 
         return startPairLinkerMap
+    }
+    private fun addToMap(map : MutableMap<Pair<String,String>, MutableList<CardInventory>>,key : Pair<String,String>,value : CardInventory){
+        if(key in map){
+            map[key]?.add(value)
+        }else {
+            map[key] = mutableListOf(value)
+        }
+    }
+    fun debugToCache(context : Context) {
+        val neFile = File(context.cacheDir, "debug.txt")
+        neFile.bufferedWriter().use { out ->
+            pairLinkedMap.forEach {
+                val line = "(${it.key.first},${it.key.second} -> ${it.value})\n"
+                out.write(line)
+            }
+        }
     }
 
     private fun createListPair(list : List<CardInventory>) : Set<String> {

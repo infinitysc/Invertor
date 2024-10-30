@@ -140,7 +140,7 @@ class BabyCardFragment : Fragment() {
                 thrid.text.toString(),
                 papa?.cabinet,
                 papaCard?.Cod1C,
-
+                parentEqueipment = papaCard?.UEID!!
             )
             addToEndJsonFile(newBabyCard)
 
@@ -370,40 +370,13 @@ class BabyCardFragment : Fragment() {
         }
     }
 
-    private fun createEditedCard(
-        user: NewUser,
-        card: CardInventory?,
-        newSerialNumberString: String,
-        date: String,
-        status: String,
-        change: Int,
-        cabinet: String,
-        ps: String
-    ): CardInventory {
-
-        return CardInventory(
-            card!!.SID,
-            card.UEID,
-            card.UEDescription,
-            date,
-            user.adress,
-            status,
-            card.inventNumb,
-            newSerialNumberString,
-            change,
-            "${user.user?.id}|${user.user?.userName}",//заглушка
-            ps,
-            cabinet,
-            card.Cod1C
-        )
-    }
     private fun getMax() : Int {
         val file = File(requireContext().cacheDir,"max.txt")
         return file.readText().toInt()
     }
     private fun updateMax(){
         FileWriter(File(requireContext().cacheDir,"max.txt")).use {
-            it.write(max)
+            it.write((max + 1).toString()) //?
             it.flush()
         }
     }

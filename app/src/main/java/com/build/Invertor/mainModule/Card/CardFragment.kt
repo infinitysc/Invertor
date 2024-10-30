@@ -400,6 +400,7 @@ var Cod1C : String?,*/
         oldCard.Description = newCard.Description
         oldCard.Cabinet = newCard.Cabinet
         oldCard.Cod1C = newCard.Cod1C
+        oldCard.parentEqueipment = newCard.parentEqueipment
         return oldCard
     }
 
@@ -456,7 +457,8 @@ var Cod1C : String?,*/
             "${user.user?.id}|${user.user?.userName}",//заглушка
             ps,
             cabinet,
-            card.Cod1C
+            card.Cod1C,
+            parentEqueipment = 0
         )
     }
 

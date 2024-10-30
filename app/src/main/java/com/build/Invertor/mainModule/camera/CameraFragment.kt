@@ -18,9 +18,7 @@ import com.build.Invertor.mainModule.ListCho.ListChoiceFragment
 import com.build.Invertor.model.NewUser
 import com.build.Invertor.model.json.CardInventory
 import com.build.Invertor.model.json.JsonDownloader
-import com.google.gson.Gson
 import com.google.gson.GsonBuilder
-import com.google.gson.reflect.TypeToken
 import com.google.zxing.BarcodeFormat
 import com.journeyapps.barcodescanner.BarcodeCallback
 import com.journeyapps.barcodescanner.BarcodeView
@@ -158,7 +156,7 @@ class CameraFragment : Fragment(){
                         .replace(R.id.mainFrameLayout, CardFragment.newInstance(singleList, card[0], null))
                         .addToBackStack("papa")
                         .commit()
-                    card.size > 2 -> multipleChoice(card)
+                    card.size >= 2 -> multipleChoice(card)
                     else -> {
                         Toast.makeText(requireContext(),"Значение не найдено",Toast.LENGTH_SHORT).show()
                     }
@@ -235,14 +233,29 @@ class CameraFragment : Fragment(){
     private fun searcheable(nomer : String) : List<CardInventory> {
 
         val mutList : MutableList<CardInventory> = mutableListOf()
+/*
         val mapTemp = jsonDownloader!!.getPairLinkedMap()
+
+        jsonDownloader!!.debugToCache(requireContext())
 
         for(i in mapTemp.iterator()){
             val key = i.key
+
             if(key.second == nomer || key.first == nomer){
                 mutList.add(i.value)
             }
+        }*/
+
+        val maptemp = jsonDownloader!!.exp_createDoubleLink()
+        for(i in maptemp.iterator()){
+            val key = i.key
+            if(key.second == nomer || key.first == nomer){
+                for(j in i.value.iterator()){
+                    mutList.add(j)
+                }
+            }
         }
+
         return mutList
     }
 
