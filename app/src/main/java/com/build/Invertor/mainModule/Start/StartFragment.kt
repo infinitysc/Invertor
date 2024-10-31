@@ -87,7 +87,8 @@ class StartFragment  : Fragment(){
         val fileName = "data.xlsx"
         val file = File(requireContext().filesDir,fileName)
         if(file.exists()){
-            data = DataDownloader(file.inputStream())
+            data = DataDownloader(file.inputStream(),requireContext())
+            data!!.debugStr("254,\"Хранение(г. Бахчисарай, ул. Советская, 20)\",\"Отдел склад\"",requireContext())
         }
         else {
             Toast.makeText(requireContext(),"data файл не существует",Toast.LENGTH_LONG).show()
@@ -212,10 +213,7 @@ class StartFragment  : Fragment(){
     }
 
     private fun delete(str : String) : String {
-        var newStr = str.replace("\"","").also {
-            it.replace(" (КВОТА-ИНВАЛИД)","")
-            it.replace(" (КВОТА - ИНВАЛИД) ","")
-        }
+        var newStr = str.replace("\"","")
         return newStr
     }
 
@@ -246,19 +244,25 @@ class StartFragment  : Fragment(){
         else {
             json = installJsonFile()
             if(json != null){
-                this.cacheMax()
-                val singleUser = searchUser()
-                val newAbsUser = NewUser(singleUser,cabinetEditor.text.toString(),spinAdr)
-                if(singleUser != null){
-                    val newFragment = CameraFragment.newInstance(newAbsUser, json)
-                    Log.d("FragmentReplace","Вызван следующий фрагмент CameraFragment")
-                    activityFragmentManager.beginTransaction()
-                        .replace(R.id.mainFrameLayout,newFragment)
-                        .addToBackStack("MainFragment")
-                        .commit()
+                if(spinAdr != "")
+                {
+                    this.cacheMax()
+                    val singleUser = searchUser()
+                    val newAbsUser = NewUser(singleUser,cabinetEditor.text.toString(),spinAdr)
+                    if(singleUser != null){
+                        val newFragment = CameraFragment.newInstance(newAbsUser, json)
+                        Log.d("FragmentReplace","Вызван следующий фрагмент CameraFragment")
+                        activityFragmentManager.beginTransaction()
+                            .replace(R.id.mainFrameLayout,newFragment)
+                            .addToBackStack("MainFragment")
+                            .commit()
+                    }
+                    else {
+                        Toast.makeText(requireContext(),"Укажите ФИО сотрудника или его кабинет",Toast.LENGTH_SHORT).show()
+                    }
                 }
                 else {
-                    Toast.makeText(requireContext(),"Укажите ФИО сотрудника или его кабинет",Toast.LENGTH_SHORT).show()
+                    Toast.makeText(requireContext(),"Выберите адресс",Toast.LENGTH_SHORT).show()
                 }
             }
             else {

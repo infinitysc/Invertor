@@ -76,9 +76,6 @@ class CardFragment : Fragment(){
         this.activityContext = context
     }
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -106,7 +103,12 @@ class CardFragment : Fragment(){
 
         spinnerStatus.adapter = ArrayAdapter(activityContext,R.layout.spinner,listSpin)
 
-        spinnerStatus.setSelection(listSpin.indexOf(card?.Status))
+        if(card?.Status != null)
+        {
+            spinnerStatus.setSelection(listSpin.indexOf(card?.Status))
+        }else {
+            spinnerStatus.setSelection(listSpin.indexOf("В эксплуатации"))
+        }
 
         sNEditor.setText(card?.SerialNumb)
 
@@ -146,7 +148,8 @@ class CardFragment : Fragment(){
             BarcodeFormat.CODE_128,
             BarcodeFormat.CODE_39,
             BarcodeFormat.EAN_8,
-            BarcodeFormat.EAN_13
+            BarcodeFormat.EAN_13,
+            BarcodeFormat.QR_CODE,
         ))
         scopeScanner.resume()
         torch.setOnCheckedChangeListener{_, isChecked ->
@@ -454,8 +457,8 @@ var Cod1C : String?,*/
             card.inventNumb,
             newSerialNumberString,
             change,
-            "${user.user?.id}|${user.user?.userName}",//заглушка
-            ps,
+            "${user.user?.id}|${user.user?.userName}",
+            if(ps == ""){null}else{ps},
             cabinet,
             card.Cod1C,
             parentEqueipment = 0

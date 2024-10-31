@@ -126,8 +126,10 @@ class JsonDownloader(private val path : InputStream) {
     fun searchMaxUEID() : Int {
         var max = 0
         for(i in list.iterator()){
-            if(i.UEID > max) {
-                max = i.UEID
+            if(i.UEID != null){
+                if(i.UEID!! > max) {
+                    max = i.UEID!!
+                }
             }
         }
         return max

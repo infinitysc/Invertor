@@ -35,10 +35,6 @@ import java.time.format.DateTimeFormatter
 
 class BabyCardFragment : Fragment() {
 
-    private var papa: NewUser? = null
-    private var papaCard: CardInventory? = null
-
-
     private lateinit var first: TextInputEditText
     private lateinit var second: TextInputEditText
     private lateinit var thrid: TextInputEditText
@@ -46,17 +42,15 @@ class BabyCardFragment : Fragment() {
     private lateinit var tap: Button
     private lateinit var inputLayoyt: TextInputLayout
 
+    private var papa: NewUser? = null
+    private var papaCard: CardInventory? = null
     private var max = 0
-
-
-
     private val sound: MediaPlayer by lazy {
         MediaPlayer.create(
             requireContext(),
             R.raw.scanner_beep
         )
     }
-
     private var spinPos = ""
     private val listSpin = listOf(
         "",
@@ -87,9 +81,9 @@ class BabyCardFragment : Fragment() {
         tap = view.findViewById(R.id.tapButton)
         inputLayoyt = view.findViewById(R.id.testL)
 
-
-
         spinner.adapter = ArrayAdapter(requireContext(), R.layout.spinner, listSpin)
+
+        spinner.setSelection(listSpin.indexOf("В эксплуатации"))
 
         inputLayoyt.setEndIconOnClickListener {
             alert().show()
@@ -128,25 +122,29 @@ class BabyCardFragment : Fragment() {
             }
             val newBabyCard = CardInventory(
                 papaCard?.SID!!,
-                max + 1 ,
-                first.text.toString(),
+                null ,
+                if(first.text.toString() == ""){null}else {first.text.toString()},
                 "${getCurrentTime()}+03",
                 papa?.adress!!,
                 spinPos,
                 papaCard?.inventNumb,
-                second.text.toString(),
+                if(second.text.toString() == ""){null}else{second.text.toString()},
                 change,
-                papa?.user?.userName,
-                thrid.text.toString(),
+                "${papa?.user?.id}|${papa?.user?.userName}",
+                if(thrid.text.toString() == ""){null}else{thrid.text.toString()},
                 papa?.cabinet,
                 papaCard?.Cod1C,
                 parentEqueipment = papaCard?.UEID!!
             )
             addToEndJsonFile(newBabyCard)
-
             updateMax()
             requireActivity().supportFragmentManager.popBackStack()
         }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        sound.release()
     }
 
     private fun debugSaveCache(card : CardInventory){
@@ -168,13 +166,12 @@ class BabyCardFragment : Fragment() {
         val type = object : TypeToken<MutableList<CardInventory>>() {}.type
         val jsonList : MutableList<CardInventory> = gsonBuilder.fromJson(file.readText(),type)
 
-
-        debugSaveCache(newCard)
-
-        if(childHasInJsonFile(jsonList,newCard)){
+        //удалить надо или переместить в тест или в тест фрагмент вообщем убрать с релиза след версии
+        //debugSaveCache(newCard)
+        /*if(childHasInJsonFile(jsonList,newCard)){
             Toast.makeText(requireContext(),"Данный дочерний обьект уже существует в файле",Toast.LENGTH_SHORT).show()
         }
-        else {
+        else {*/
 
             try {
                 jsonList.add(newCard)
@@ -187,7 +184,7 @@ class BabyCardFragment : Fragment() {
                 e.printStackTrace()
                 Log.e("FileError","$this")
             }
-        }
+        //}
     }
 
     private fun getCacheFileToReWrite(fileNameFromCache : String,card : CardInventory) {
@@ -260,7 +257,8 @@ class BabyCardFragment : Fragment() {
                 BarcodeFormat.CODE_128,
                 BarcodeFormat.CODE_39,
                 BarcodeFormat.EAN_8,
-                BarcodeFormat.EAN_13
+                BarcodeFormat.EAN_13,
+                BarcodeFormat.QR_CODE,
             )
         )
         scopeScanner.resume()

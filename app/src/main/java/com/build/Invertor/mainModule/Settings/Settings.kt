@@ -56,16 +56,15 @@ class Settings : Fragment() {
         }
 
         importButton.setOnClickListener(){
-            if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU){
+            if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.R){
                 import()
             }
             else{
                 if(ContextCompat.checkSelfPermission(requireContext(), android.Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED ||
                     ContextCompat.checkSelfPermission(requireContext(), android.Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
 
-                    ActivityCompat.requestPermissions(requireActivity(),
-                        arrayOf(android.Manifest.permission.READ_EXTERNAL_STORAGE, android.Manifest.permission.WRITE_EXTERNAL_STORAGE),
-                        1)
+                    ActivityCompat
+                        .requestPermissions(requireActivity(), arrayOf(android.Manifest.permission.READ_EXTERNAL_STORAGE, android.Manifest.permission.WRITE_EXTERNAL_STORAGE), 1)
                 }
                 else{
                     import()
@@ -144,7 +143,7 @@ class Settings : Fragment() {
         }
     }
 
-    fun launchBaseDirectoryPicker() {
+    private fun launchBaseDirectoryPicker() {
         val intent = Intent(Intent.ACTION_OPEN_DOCUMENT_TREE)
         launcher.launch(intent)
     }
@@ -155,7 +154,7 @@ class Settings : Fragment() {
         return uriString?.let { Uri.parse(it) }
     }
 
-    fun exportJsonFileFromInternalStorage(fileName: String) {
+    private fun exportJsonFileFromInternalStorage(fileName: String) {
         try {
             val uri = getBaseDocumentTreeUri()
             if (uri != null) {
