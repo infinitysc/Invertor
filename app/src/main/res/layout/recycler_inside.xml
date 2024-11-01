@@ -2,28 +2,30 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="wrap_content"
+    android:layout_width="match_parent"
     android:layout_height="wrap_content">
 
     <TextView
         android:id="@+id/cont"
         android:layout_width="176dp"
         android:layout_height="46dp"
-        android:layout_marginStart="232dp"
-        android:layout_marginTop="212dp"
+        android:layout_marginTop="20dp"
         android:background="#9FFF03"
         android:clickable="true"
+        android:gravity="center"
         android:text="@string/right"
+        android:textAlignment="center"
+        android:textAllCaps="true"
         android:visibility="visible"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/choiceDescription" />
 
     <TextView
         android:id="@+id/choiceDescription"
         android:layout_width="381dp"
         android:layout_height="116dp"
         android:layout_marginStart="16dp"
-        android:layout_marginTop="12dp"
+        android:layout_marginTop="8dp"
         android:text="@string/choiceDescription"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/choiceAdress" />
@@ -31,9 +33,9 @@
     <TextView
         android:id="@+id/choiceAdress"
         android:layout_width="381dp"
-        android:layout_height="26dp"
+        android:layout_height="45dp"
         android:layout_marginStart="16dp"
-        android:layout_marginTop="12dp"
+        android:layout_marginTop="8dp"
         android:text="@string/choiceAdress"
         android:visibility="visible"
         app:layout_constraintStart_toStartOf="parent"
@@ -42,7 +44,7 @@
     <TextView
         android:id="@+id/choiceInvent"
         android:layout_width="381dp"
-        android:layout_height="26dp"
+        android:layout_height="35dp"
         android:layout_marginStart="16dp"
         android:layout_marginTop="16dp"
         android:text="@string/choiceInvent"
@@ -53,9 +55,9 @@
     <TextView
         android:id="@+id/time"
         android:layout_width="207dp"
-        android:layout_height="46dp"
+        android:layout_height="50dp"
         android:layout_marginStart="16dp"
-        android:layout_marginTop="4dp"
+        android:layout_marginTop="8dp"
         android:text="time"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/choiceDescription" />

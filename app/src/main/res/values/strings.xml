@@ -38,8 +38,8 @@
     <string name = "right">Продолжить</string>
 
     <!-- settings_fragment-->
-    <string name = "exportText">Экспорт файла</string>
-    <string name = "importText">Импорт файла</string>
+    <string name = "exportText">Экспорт файла c объектами</string>
+    <string name = "importText">Импорт файла с объектами</string>
     <string name = "importButton">Импорт</string>
     <string name = "exportButton">Экспорт</string>
     <string name = "importExcelText">Импорт эксель данных</string>

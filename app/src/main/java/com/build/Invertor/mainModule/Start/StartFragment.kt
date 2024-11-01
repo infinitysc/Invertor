@@ -63,6 +63,7 @@ class StartFragment  : Fragment(){
     private lateinit var cabinetEditor : TextInputEditText
     private lateinit var departament : TextView
     private lateinit var adressSpinner : Spinner
+    private var positionIndex = 0
 
     private val activityFragmentManager : FragmentManager by lazy { activity?.supportFragmentManager!! }
 
@@ -71,6 +72,10 @@ class StartFragment  : Fragment(){
     }
     private val listStr : List<String> by lazy {
         txtToList(requireContext().assets.open("iDAdress.txt"))
+    }
+
+    private val listUserName : List<String>? by lazy {
+        createListUserName(data!!)
     }
     private fun txtToList(input : InputStream) : List<String> {
         return try {
@@ -88,7 +93,7 @@ class StartFragment  : Fragment(){
         val file = File(requireContext().filesDir,fileName)
         if(file.exists()){
             data = DataDownloader(file.inputStream(),requireContext())
-            data!!.debugStr("254,\"Хранение(г. Бахчисарай, ул. Советская, 20)\",\"Отдел склад\"",requireContext())
+            //data!!.debugStr("254,\"Хранение(г. Бахчисарай, ул. Советская, 20)\",\"Отдел склад\"",requireContext())
         }
         else {
             Toast.makeText(requireContext(),"data файл не существует",Toast.LENGTH_LONG).show()
@@ -128,7 +133,7 @@ class StartFragment  : Fragment(){
 
         searchData()
         if(data != null){
-            val array : ArrayAdapter<String> = ArrayAdapter(requireContext(),R.layout.spinner,createListUserName(data!!))
+            val array : ArrayAdapter<String> = ArrayAdapter(requireContext(),R.layout.spinner,listUserName!!)
             searchEditText.setAdapter(array)
             Toast.makeText(requireContext()," Данные с пользователями загружены",Toast.LENGTH_SHORT).show()
             Log.d("FileWork","excel data загружена в внутренее хранилище $this")
@@ -165,7 +170,9 @@ class StartFragment  : Fragment(){
                 id: Long
             ) {
                 var tempUser = searchEditText.text.toString()
+                //positionIndex = position
                 departament.text = searchDepartament(tempUser,list!!)
+                //departament.text = searchDepartamentExp(tempUser,list!!)//exp
                 val imm = requireActivity().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
                 imm.hideSoftInputFromWindow(searchEditText.windowToken, 0)
                 Toast.makeText(requireContext(),"Выбран пользователь $tempUser",Toast.LENGTH_SHORT).show()
@@ -188,10 +195,21 @@ class StartFragment  : Fragment(){
     private fun searchDepartament(str : String,list : List<User>) : String{
         for(i in list.iterator()){
             if(i.userName == str){
+                Log.d("DebugSearchDepartament","${i.id}|${i.userName}|${i.departament}")
                 return i.departament
             }
         }
         return ""
+    }
+
+    private fun searchDepartamentExp(str : String,List: List<User>) : String {
+        Log.d("DebugSearchDepartament","${positionIndex}|${str}|${List[positionIndex].id}|${List[positionIndex].userName}|${List[positionIndex].departament}")
+        return if(List[positionIndex].userName == str){
+            List[positionIndex].departament
+        }
+        else {
+            ""
+        }
     }
 
     private fun installJsonFile(fileName : String = "jso.json") : JsonDownloader? {
@@ -207,25 +225,25 @@ class StartFragment  : Fragment(){
         val tempMap = data.getList()!!
         val tempList = mutableListOf<String>()
         for (i in tempMap.iterator()) {
-            tempList.add(delete(i.userName))
+            tempList.add(i.userName)
+            //tempList.add("${i.id}|${i.userName}")
+            /*if(i.userName =="Шеремет Эдуард Анатольевич"){
+                Log.d("DebugSearchDepartament","${i.id}|${i.userName}|${i.departament}")
+            }*/
         }
         return tempList
     }
 
-    private fun delete(str : String) : String {
-        var newStr = str.replace("\"","")
-        return newStr
-    }
 
     private fun searchUser() : User? {
-        val chooseStr = searchEditText.text
-        if(chooseStr.toString() != "") {
+        val chooseStr = searchEditText.text.toString()
+        if(chooseStr != "") {
             val tempMap = data!!.createLinkedMap()
-            return if (tempMap.containsKey(chooseStr.toString())) {
-                tempMap.get(chooseStr.toString())
+            return if (tempMap.containsKey(chooseStr)) {
+                tempMap.get(chooseStr)
             } else {
                 Toast.makeText(
-                    activity?.applicationContext,
+                    requireContext(),
                     "Пользователь не найден",
                     Toast.LENGTH_SHORT
                 ).show()
@@ -237,6 +255,29 @@ class StartFragment  : Fragment(){
             return null
         }
     }
+
+    private fun searchUserExp() : User? {
+        val chooseStr = searchEditText.text.toString() // id|UserName
+        if(chooseStr != ""){
+            val idStr = chooseStr.substringBefore("|")
+            val tempMap = data!!.createIdLinkedMao()
+            return if(tempMap.containsKey(idStr)){
+                tempMap.get(idStr)
+            }else {
+                Toast.makeText(
+                    requireContext(),
+                    "Пользователь не найден",
+                    Toast.LENGTH_SHORT
+                ).show()
+                null
+            }
+        }
+        else {
+            Toast.makeText(requireContext(),"Выберите пользователя",Toast.LENGTH_SHORT).show()
+            return null
+        }
+    }
+
     private fun check(reqCode : Int) {
         if(ContextCompat.checkSelfPermission(requireContext(),android.Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED){ //работает и на 30+ андроиде
             ActivityCompat.requestPermissions(requireActivity(), arrayOf(android.Manifest.permission.CAMERA),reqCode)
@@ -244,21 +285,26 @@ class StartFragment  : Fragment(){
         else {
             json = installJsonFile()
             if(json != null){
-                if(spinAdr != "")
+                if(spinAdr != "Выберите адрес")
                 {
-                    this.cacheMax()
-                    val singleUser = searchUser()
-                    val newAbsUser = NewUser(singleUser,cabinetEditor.text.toString(),spinAdr)
-                    if(singleUser != null){
-                        val newFragment = CameraFragment.newInstance(newAbsUser, json)
-                        Log.d("FragmentReplace","Вызван следующий фрагмент CameraFragment")
-                        activityFragmentManager.beginTransaction()
-                            .replace(R.id.mainFrameLayout,newFragment)
-                            .addToBackStack("MainFragment")
-                            .commit()
+                    if(cabinetEditor.text.toString() == ""){
+                        Toast.makeText(requireContext(),"Введите кабинет(окно)",Toast.LENGTH_SHORT).show()
                     }
                     else {
-                        Toast.makeText(requireContext(),"Укажите ФИО сотрудника или его кабинет",Toast.LENGTH_SHORT).show()
+                        this.cacheMax()
+                        val singleUser = searchUser()
+                        val newAbsUser = NewUser(singleUser,cabinetEditor.text.toString(),spinAdr)
+                        if(singleUser != null){
+                            val newFragment = CameraFragment.newInstance(newAbsUser, json)
+                            Log.d("FragmentReplace","Вызван следующий фрагмент CameraFragment")
+                            activityFragmentManager.beginTransaction()
+                                .replace(R.id.mainFrameLayout,newFragment)
+                                .addToBackStack("MainFragment")
+                                .commit()
+                        }
+                        else {
+                            Toast.makeText(requireContext(),"Укажите ФИО сотрудника или его кабинет",Toast.LENGTH_SHORT).show()
+                        }
                     }
                 }
                 else {

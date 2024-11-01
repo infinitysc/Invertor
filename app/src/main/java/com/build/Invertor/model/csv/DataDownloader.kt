@@ -123,6 +123,13 @@ class DataDownloader(private val path : InputStream,private val mContext: Contex
         return tempMap
     }
 
+    fun createIdLinkedMao() : Map<String,User>{
+        val tempMap = mutableMapOf<String,User>()
+        for(i in this.list.iterator()){
+            tempMap.put(i.id.toString(),i)
+        }
+        return tempMap
+    }
     private fun addToList(user : User) {
         this.list.add(user)
     }

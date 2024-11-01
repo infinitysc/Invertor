@@ -15,6 +15,7 @@ import androidx.fragment.app.FragmentManager
 import com.build.Invertor.R
 import com.build.Invertor.mainModule.Card.CardFragment
 import com.build.Invertor.mainModule.ListCho.ListChoiceFragment
+import com.build.Invertor.model.Model
 import com.build.Invertor.model.NewUser
 import com.build.Invertor.model.json.CardInventory
 import com.build.Invertor.model.json.JsonDownloader
@@ -32,6 +33,9 @@ import java.util.concurrent.Executors
 /**
  *
  *  В этом фрагменте происходит сканирование и вывод информации об сотруднике и код который мы получили от сканера
+ *
+ *  TODO:
+ *  Оптимизировать работу данного фрагмента
  * **/
 class CameraFragment : Fragment(){
 

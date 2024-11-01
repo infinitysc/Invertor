@@ -19,10 +19,7 @@ import androidx.core.content.ContextCompat
 import androidx.documentfile.provider.DocumentFile
 import androidx.fragment.app.Fragment
 import com.build.Invertor.R
-import java.io.BufferedReader
-import java.io.IOException
-import java.io.InputStream
-import java.io.InputStreamReader
+import java.io.*
 
 class Settings : Fragment() {
 
@@ -51,8 +48,23 @@ class Settings : Fragment() {
 
     override fun onStart() {
         super.onStart()
+
         importExcelButton.setOnClickListener{
-            IntentConfiguratorExcel()
+            //buildVersion
+            if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.R){
+                IntentConfiguratorExcel()
+            }
+            else {
+                if(ContextCompat.checkSelfPermission(requireContext(), android.Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED ||
+                    ContextCompat.checkSelfPermission(requireContext(), android.Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+
+                    ActivityCompat
+                        .requestPermissions(requireActivity(), arrayOf(android.Manifest.permission.READ_EXTERNAL_STORAGE, android.Manifest.permission.WRITE_EXTERNAL_STORAGE), 1)
+                }
+                else{
+                    IntentConfiguratorExcel()
+                }
+            }
         }
 
         importButton.setOnClickListener(){
@@ -73,12 +85,22 @@ class Settings : Fragment() {
         }
 
         exportButton.setOnClickListener(){
+            if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.R){
+                if(File(requireContext().filesDir,"jso.json").exists())
+                {
+                    toExportJsonFileFromInternalStorage("jso.json")
+                }
+                else{
+                    Toast.makeText(requireContext(),"Вы не загрузили файл",Toast.LENGTH_SHORT).show()
+                }
+
+            }
+            //BuildVersion
             if(ContextCompat.checkSelfPermission(requireContext(),android.Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED){
                 ActivityCompat.requestPermissions(requireActivity(), arrayOf(android.Manifest.permission.READ_EXTERNAL_STORAGE),1)
             }
             else{
                 //export() // краш если файла нет то ебнет
-                toExportJsonFileFromInternalStorage("jso.json")
             }
         }
 
