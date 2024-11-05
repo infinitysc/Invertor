@@ -15,6 +15,8 @@ import androidx.fragment.app.FragmentManager
 import com.build.Invertor.R
 import com.build.Invertor.mainModule.Card.CardFragment
 import com.build.Invertor.mainModule.ListCho.ListChoiceFragment
+import com.build.Invertor.mainModule.SingleActivity.MainActivity
+import com.build.Invertor.mainModule.SingleActivity.ModelSharedInterface
 import com.build.Invertor.model.Model
 import com.build.Invertor.model.NewUser
 import com.build.Invertor.model.json.CardInventory
@@ -27,8 +29,7 @@ import com.journeyapps.barcodescanner.DefaultDecoderFactory
 import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
-import java.util.concurrent.ExecutorService
-import java.util.concurrent.Executors
+
 
 /**
  *
@@ -47,14 +48,14 @@ class CameraFragment : Fragment(){
      * **/
 
     private lateinit var button : Button
-    private lateinit var cameraExecutor : ExecutorService
     private lateinit var contex : Context
     private lateinit var valueText : TextView
     private lateinit var userText : TextView
     private lateinit var barcodeView : BarcodeView
     private lateinit var switch : SwitchCompat
 
-    val sound : MediaPlayer by lazy { MediaPlayer.create(requireContext(),R.raw.scanner_beep) }
+    private val sound : MediaPlayer by lazy { MediaPlayer.create(requireContext(),R.raw.scanner_beep) }
+
     private var singleList : NewUser? = null
     private var jsonDownloader: JsonDownloader? = null
     private var valueString : String = "defaultStringValue"
@@ -64,11 +65,18 @@ class CameraFragment : Fragment(){
         BarcodeFormat.CODE_93,
         BarcodeFormat.EAN_13,
         BarcodeFormat.EAN_8,
+        BarcodeFormat.CODABAR,
+        BarcodeFormat.UPC_E,
+        BarcodeFormat.UPC_A,
+        BarcodeFormat.UPC_EAN_EXTENSION
     )
     private val activityFragmentManager : FragmentManager by lazy { activity?.supportFragmentManager!! }
     private val listInCode : List<String> by lazy  {jsonDownloader?.getListCode()!!}
     override fun onAttach(context: Context) {
         this.contex = context
+        /*if(context is ModelSharedInterface){
+            model = context.getModel()
+        }*/
         super.onAttach(context)
     }
 
@@ -137,7 +145,6 @@ class CameraFragment : Fragment(){
 
         updateData()
 
-        cameraExecutor = Executors.newSingleThreadExecutor()
         barcodeView.resume()
 
         switch.setOnCheckedChangeListener{_ , isCheked ->
@@ -193,7 +200,6 @@ class CameraFragment : Fragment(){
         super.onDestroy()
        // newFileIntoInternalStorage("jso.json",this.jsonDownloader!!) // nullpointerexception когда свайп без импорта?
         sound.release()
-        cameraExecutor.shutdown()
     }
 
 
@@ -251,6 +257,7 @@ class CameraFragment : Fragment(){
         }*/
 
         val maptemp = jsonDownloader!!.exp_createDoubleLink()
+
         for(i in maptemp.iterator()){
             val key = i.key
             if(key.second == nomer || key.first == nomer){

@@ -91,7 +91,8 @@ class ListChoiceFragment : Fragment() {
     override fun onPause() {
         super.onPause()
     }
-    //вовремя onStop вызывается чтобы обновить данные во вью
+
+    //??
     private fun updateDataFromCache(fileName : String): List<CardInventory>? {
         val file = checkFile(fileName)
         if(file != null){

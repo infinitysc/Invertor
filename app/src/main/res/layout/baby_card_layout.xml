@@ -20,7 +20,7 @@
             android:id="@+id/opi"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:hint="Описание" />
+            android:hint="@string/aboutItem" />
     </com.google.android.material.textfield.TextInputLayout>
 
     <com.google.android.material.textfield.TextInputLayout
@@ -40,7 +40,7 @@
             android:id="@+id/ser"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:hint="Серийный номер" />
+            android:hint="@string/serialNumberEdit" />
     </com.google.android.material.textfield.TextInputLayout>
 
     <com.google.android.material.textfield.TextInputLayout
@@ -58,16 +58,16 @@
             android:id="@+id/desc"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:hint="Примечание" />
+            android:hint="@string/note" />
     </com.google.android.material.textfield.TextInputLayout>
 
     <Button
         android:id="@+id/tapButton"
-        android:layout_width="214dp"
-        android:layout_height="46dp"
+        android:layout_width="299dp"
+        android:layout_height="64dp"
         android:layout_marginTop="24dp"
         android:layout_marginEnd="24dp"
-        android:text="Button"
+        android:text="@string/backPapaButtonString"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/spinn" />
 
@@ -86,7 +86,7 @@
         android:layout_height="30dp"
         android:layout_marginTop="16dp"
         android:layout_marginEnd="8dp"
-        android:text="Статус"
+        android:text="@string/status"
         app:layout_constraintEnd_toStartOf="@+id/spinn"
         app:layout_constraintTop_toBottomOf="@+id/textInputLayout3" />
 

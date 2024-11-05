@@ -50,15 +50,15 @@ android:layout_height="match_parent">
     app:layout_constraintStart_toStartOf="parent"
     app:layout_constraintTop_toBottomOf="@+id/adress" />
 
-<TextView
-    android:id="@+id/user"
-    android:layout_width="380dp"
-    android:layout_height="44dp"
-    android:layout_marginStart="16dp"
-    android:layout_marginTop="4dp"
-    android:text="@string/user"
-    app:layout_constraintStart_toStartOf="parent"
-    app:layout_constraintTop_toBottomOf="@+id/oldUser" />
+    <TextView
+        android:id="@+id/user"
+        android:layout_width="380dp"
+        android:layout_height="50dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="4dp"
+        android:text="@string/user"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/oldUser" />
 
     <Button
         android:id="@+id/saveButton"
@@ -111,15 +111,15 @@ android:layout_height="match_parent">
     app:layout_constraintStart_toStartOf="parent"
     app:layout_constraintTop_toBottomOf="@+id/serialNimberEditLayout" />
 
-<TextView
-    android:id="@+id/oldUser"
-    android:layout_width="380dp"
-    android:layout_height="44dp"
-    android:layout_marginStart="16dp"
-    android:layout_marginTop="12dp"
-    android:text="@string/oldUser"
-    app:layout_constraintStart_toStartOf="parent"
-    app:layout_constraintTop_toBottomOf="@+id/spinnerStatus" />
+    <TextView
+        android:id="@+id/oldUser"
+        android:layout_width="380dp"
+        android:layout_height="50dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="12dp"
+        android:text="@string/oldUser"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/spinnerStatus" />
 
 <TextView
     android:id="@+id/invenNumb"

@@ -4,6 +4,7 @@ import android.app.AlertDialog
 import android.content.Context
 import android.media.MediaPlayer
 import android.os.Bundle
+import android.util.EventLogTags
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -121,20 +122,20 @@ class BabyCardFragment : Fragment() {
                 0
             }
             val newBabyCard = CardInventory(
-                papaCard?.SID!!,
-                null ,
-                if(first.text.toString() == ""){null}else {first.text.toString()},
-                "${getCurrentTime()}+03",
-                papa?.adress!!,
-                spinPos,
-                papaCard?.inventNumb,
-                if(second.text.toString() == ""){null}else{second.text.toString()},
-                change,
-                "${papa?.user?.id}|${papa?.user?.userName}",
-                if(thrid.text.toString() == ""){null}else{thrid.text.toString()},
-                papa?.cabinet,
-                papaCard?.Cod1C,
-                parentEqueipment = papaCard?.UEID!!
+                SID =  papaCard?.SID!!,
+                UEID = null ,
+                UEDescription = if(first.text.toString() == ""){null}else {first.text.toString()},
+                ActionDateTime = "${getCurrentTime()}+03",
+                Adress = papa?.adress!!,
+                Status = spinPos,
+                inventNumb = papaCard?.inventNumb,
+                SerialNumb = if(second.text.toString() == ""){null}else{second.text.toString()},
+                IsSNEdited = change,
+                UserName = "${papa?.user?.id}|${papa?.user?.userName}",
+                Description = if(thrid.text.toString() == ""){null}else{thrid.text.toString()},
+                Cabinet = papa?.cabinet,
+                Cod1C = papaCard?.Cod1C,
+                parentEqueipment = papaCard?.UEID ?: 0
             )
             addToEndJsonFile(newBabyCard)
             updateMax()
@@ -156,8 +157,6 @@ class BabyCardFragment : Fragment() {
         }
 
     }
-    //add to endList
-
     private fun addToEndJsonFile(newCard : CardInventory) { // потом поменяю
         val file = File(requireContext().filesDir,"jso.json")
         val gsonBuilder = GsonBuilder()
@@ -166,24 +165,17 @@ class BabyCardFragment : Fragment() {
         val type = object : TypeToken<MutableList<CardInventory>>() {}.type
         val jsonList : MutableList<CardInventory> = gsonBuilder.fromJson(file.readText(),type)
 
-        //удалить надо или переместить в тест или в тест фрагмент вообщем убрать с релиза след версии
-        //debugSaveCache(newCard)
-        /*if(childHasInJsonFile(jsonList,newCard)){
-            Toast.makeText(requireContext(),"Данный дочерний обьект уже существует в файле",Toast.LENGTH_SHORT).show()
-        }
-        else {*/
-
-            try {
-                jsonList.add(newCard)
-                FileOutputStream(file).use {
-                    it.write(gsonBuilder.toJson(jsonList).toByteArray())
-                    it.flush()
-                    Log.d("FileWork","в файл был добавлен зависимый элемент")
-                }
-            }catch (e : IOException){
-                e.printStackTrace()
-                Log.e("FileError","$this")
+        try {
+            jsonList.add(newCard)
+            FileOutputStream(file).use {
+                it.write(gsonBuilder.toJson(jsonList).toByteArray())
+                it.flush()
+                Log.d("FileWork","в файл был добавлен зависимый элемент")
             }
+        }catch (e : IOException){
+            e.printStackTrace()
+            Log.e("FileError","$this")
+        }
         //}
     }
 
@@ -233,6 +225,7 @@ class BabyCardFragment : Fragment() {
         return dateTime.format(formatter)
     }
 
+    //достаточно дорогое действие? создавать каждый раз экземпляр barcodeView
     private fun alert(): AlertDialog {
         var value = ""
         val dialogView =
@@ -259,6 +252,11 @@ class BabyCardFragment : Fragment() {
                 BarcodeFormat.EAN_8,
                 BarcodeFormat.EAN_13,
                 BarcodeFormat.QR_CODE,
+                BarcodeFormat.ITF,
+                BarcodeFormat.UPC_EAN_EXTENSION,
+                BarcodeFormat.UPC_E,
+                BarcodeFormat.UPC_A,
+                BarcodeFormat.CODABAR
             )
         )
         scopeScanner.resume()
@@ -327,7 +325,7 @@ class BabyCardFragment : Fragment() {
         oldCard.inventNumb = newCard.inventNumb
         oldCard.SerialNumb = newCard.SerialNumb
         oldCard.IsSNEdited = newCard.IsSNEdited
-        oldCard.UserNаме = newCard.UserNаме
+        oldCard.UserName = newCard.UserName
         oldCard.Description = newCard.Description
         oldCard.Cabinet = newCard.Cabinet
         oldCard.Cod1C = newCard.Cod1C

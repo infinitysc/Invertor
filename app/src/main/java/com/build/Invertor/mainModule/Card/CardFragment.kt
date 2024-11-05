@@ -150,6 +150,11 @@ class CardFragment : Fragment(){
             BarcodeFormat.EAN_8,
             BarcodeFormat.EAN_13,
             BarcodeFormat.QR_CODE,
+            BarcodeFormat.ITF,
+            BarcodeFormat.UPC_EAN_EXTENSION,
+            BarcodeFormat.UPC_E,
+            BarcodeFormat.UPC_A,
+            BarcodeFormat.CODABAR
         ))
         scopeScanner.resume()
         torch.setOnCheckedChangeListener{_, isChecked ->
@@ -180,7 +185,7 @@ class CardFragment : Fragment(){
 
         adress.text = card?.Adress
         dest.text = card?.UEDescription
-        oldUser.text = "Старый пользователь : ${card?.UserNаме?.substringAfter("|")}"
+        oldUser.text = "Старый пользователь : ${card?.UserName?.substringAfter("|")}"
         userWidget.text = "Новый пользователь : ${user?.user?.userName}"
         inventNumb.text = "Инвентарный номер : ${card?.inventNumb}"
 
@@ -216,7 +221,7 @@ class CardFragment : Fragment(){
                     status = itemSelected,
                     change = change,
                     cabinet = this.user!!.cabinet.toString(), // заглушка
-                    ps = ps.text.toString()
+                    note = ps.text.toString()
                 )
                 val gson = Gson()
                 saveJsonString = gson.toJson(saveCard)
@@ -245,7 +250,7 @@ class CardFragment : Fragment(){
                         status = itemSelected,
                         change = change,
                         cabinet = this.user!!.cabinet.toString(),
-                        ps = ps.text.toString()
+                        note = ps.text.toString()
                     )
                     val gson = Gson()
                     saveJsonString = gson.toJson(saveCard)
@@ -276,6 +281,7 @@ class CardFragment : Fragment(){
              * cod1c +
              *
              * */
+
             var change = 0
             oldSnNumber = sNEditor.text.toString()
             if(oldSnNumber != ""){
@@ -289,13 +295,20 @@ class CardFragment : Fragment(){
                 status = itemSelected,
                 change = change,
                 cabinet = this.user!!.cabinet.toString(),
-                ps = ps.text.toString()
+                note = ps.text.toString()
             )
-            requireActivity().supportFragmentManager.beginTransaction()
-                .replace(R.id.mainFrameLayout,BabyCardFragment.newInstance(papaCard,this.user!!))
-                .addToBackStack("dependency_Card")
-                .commit()
-
+            if(papaCard.UEID == null){
+                Toast.makeText(requireContext(),"Из дочернего обьекта сделать дочерний невозможно!",Toast.LENGTH_SHORT).show()
+            }
+            else {
+                requireActivity().supportFragmentManager.beginTransaction()
+                    .replace(
+                        R.id.mainFrameLayout,
+                        BabyCardFragment.newInstance(papaCard, this.user!!)
+                    )
+                    .addToBackStack("dependency_Card")
+                    .commit()
+            }
         }
 
 
@@ -376,20 +389,6 @@ class CardFragment : Fragment(){
      }
 
     }
-/**
- *  var SID : Int ,
-var UEID : Int ,
-var UEDescription : String?,
-var ActionDateTime : String?,
-var Adress : String?,
-var Status : String?,
-var inventNumb : String?,
-var SerialNumb : String,
-var IsSNEdited : Int ,
-var UserNаме : String?,
-var Description : String?,
-var Cabinet : String?,
-var Cod1C : String?,*/
     private fun reWrite(oldCard : CardInventory,newCard : CardInventory) : CardInventory {
         oldCard.SID = newCard.SID
         oldCard.UEDescription = newCard.UEDescription
@@ -399,7 +398,7 @@ var Cod1C : String?,*/
         oldCard.inventNumb = newCard.inventNumb
         oldCard.SerialNumb = newCard.SerialNumb
         oldCard.IsSNEdited = newCard.IsSNEdited
-        oldCard.UserNаме = newCard.UserNаме // тут баг блять ,мы хотим выбирать заменять ли сотрудника на нового а она просто инстанто меняет upd! не баг а фича
+        oldCard.UserName = newCard.UserName
         oldCard.Description = newCard.Description
         oldCard.Cabinet = newCard.Cabinet
         oldCard.Cod1C = newCard.Cod1C
@@ -444,24 +443,24 @@ var Cod1C : String?,*/
         status : String,
         change : Int,
         cabinet : String,
-        ps : String
+        note : String
         ) : CardInventory {
 
         return CardInventory(
-            card!!.SID,
-            card.UEID,
-            card.UEDescription,
-            date,
-            user.adress ,
-            status,
-            card.inventNumb,
-            newSerialNumberString,
-            change,
-            "${user.user?.id}|${user.user?.userName}",
-            if(ps == ""){null}else{ps},
-            cabinet,
-            card.Cod1C,
-            parentEqueipment = 0
+            SID = card!!.SID,
+            UEID = card.UEID,
+            UEDescription = card.UEDescription,
+            ActionDateTime = date,
+            Adress = user.adress ,
+            Status = status,
+            inventNumb = card.inventNumb,
+            SerialNumb = newSerialNumberString,
+            IsSNEdited = change,
+            UserName = "${user.user?.id}|${user.user?.userName}",
+            Description = if(note == ""){null}else{note},
+            Cabinet = cabinet,
+            Cod1C = card.Cod1C,
+            parentEqueipment = card.parentEqueipment
         )
     }
 

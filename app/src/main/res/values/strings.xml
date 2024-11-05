@@ -1,18 +1,20 @@
 <resources>
 
+    <!--Android manifest-->
     <string name="app_name">Invertor</string>
 
+    <!--StartFragment-->
     <string name = "goToScan">Перейти к сканированию</string>
     <string name = "scan">Scan</string>
-    <string name ="dffd">Ввод ФИО</string>
+    <string name ="writeFIO">Ввод ФИО</string>
     <string name = "departament">Отдел:</string>
 
     <!-- CardFragment -->
-    <string name = "adress">Адресс</string>
+    <string name = "adress">Адрес</string>
     <string name = "description">Описание</string>
     <string name = "serailNumber">Серийный номер</string>
     <string name = "status">Статус</string>
-    <string name = "user">Пользователь:</string>
+    <string name = "user">Пользователь:</string><!--Изменить надо!-->
     <string name = "needChange">Необходимо заменить</string>
     <string name = "cabinet">Кабинет</string>
     <string name = "serialNumberEdit">Серийный номер</string>
@@ -21,7 +23,6 @@
     <string name = "save">Сохранить</string>
     <string name = "chooseUserAuto">Выберите пользователя</string>
     <string name = "oldUser">Текущий сотрудник:</string>
-    <string name = "goToCard">Перейти к карточке техники</string>
     <string name = "invenNumb">Инвентарный номер:</string>
 
     <!--CameraFragment-->
@@ -30,20 +31,25 @@
     <string name = "value">Отсканированное значение</string>
     <string name = "valueText">Значение</string>
     <string name = "torch">фонарик</string>
+    <string name = "goToCard">Перейти к карточке техники</string>
 
     <!-- ListChoiceFragment-->
     <string name = "choiceInvent">Инвентарный номер:</string>
     <string name = "choiceDescription">Описание</string>
-    <string name = "choiceAdress">Адресc</string>
+    <string name = "choiceAdress">Адрес</string>
     <string name = "right">Продолжить</string>
 
-    <!-- settings_fragment-->
+    <!-- settingsFragment-->
     <string name = "exportText">Экспорт файла c объектами</string>
     <string name = "importText">Импорт файла с объектами</string>
     <string name = "importButton">Импорт</string>
     <string name = "exportButton">Экспорт</string>
     <string name = "importExcelText">Импорт эксель данных</string>
 
+    <!--BabyCardFragment-->
+    <string name = "note">Примечание</string>
+    <string name = "aboutItem">Описание</string>
+    <string name= "backPapaButtonString">Вернуться к родительскому предмету</string>
     <!-- Preference Titles -->
     <string name="messages_header">Messages</string>
     <string name="sync_header">Sync</string>

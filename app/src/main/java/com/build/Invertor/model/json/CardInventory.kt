@@ -11,7 +11,7 @@ data class CardInventory(
     var inventNumb : String?,
     var SerialNumb : String?,
     var IsSNEdited : Int ,
-    var UserNаме : String?,
+    var UserName : String?,
     var Description : String?,
     var Cabinet : String?,
     var Cod1C : String?,

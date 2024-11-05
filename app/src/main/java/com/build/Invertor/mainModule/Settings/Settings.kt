@@ -95,13 +95,29 @@ class Settings : Fragment() {
                 }
 
             }
-            //BuildVersion
-            if(ContextCompat.checkSelfPermission(requireContext(),android.Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED){
-                ActivityCompat.requestPermissions(requireActivity(), arrayOf(android.Manifest.permission.READ_EXTERNAL_STORAGE),1)
+            else {
+                //BuildVersion
+                if (ContextCompat.checkSelfPermission(
+                        requireContext(),
+                        android.Manifest.permission.READ_EXTERNAL_STORAGE
+                    ) != PackageManager.PERMISSION_GRANTED
+                ) {
+                    ActivityCompat.requestPermissions(
+                        requireActivity(),
+                        arrayOf(android.Manifest.permission.READ_EXTERNAL_STORAGE),
+                        1
+                    )
+                } else {
+                    if(File(requireContext().filesDir,"jso.json").exists())
+                    {
+                        toExportJsonFileFromInternalStorage("jso.json")
+                    }
+                    else{
+                        Toast.makeText(requireContext(),"Вы не загрузили файл",Toast.LENGTH_SHORT).show()
+                    }
+                }
             }
-            else{
-                //export() // краш если файла нет то ебнет
-            }
+
         }
 
 
