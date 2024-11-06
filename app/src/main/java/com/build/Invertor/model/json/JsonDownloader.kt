@@ -7,6 +7,8 @@ import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import com.google.gson.reflect.TypeToken
 import java.io.File
+import java.io.FileOutputStream
+import java.io.FileWriter
 import java.io.InputStream
 
 
@@ -25,18 +27,19 @@ import java.io.InputStream
  * **/
 class JsonDownloader(private val path : InputStream) {
 
-
+    private var max = 0
     private val gson : Gson = GsonBuilder().create()
     private val list : List<CardInventory>
     private val linkedMap : Map<String?, CardInventory>
     private val pairLinkedMap : Map<Pair<String,String>, CardInventory>
     private val listCod1cInvent : List<String>
+    var flag_index = false
     init {
         val jsonString = changeToString(path)
         val typeOfList = object : TypeToken<List<CardInventory>>() {}.type
-        list = gson.fromJson(jsonString,typeOfList)
+        list = gson.fromJson<List<CardInventory>?>(jsonString,typeOfList)
         linkedMap = createLink(this.list)
-        pairLinkedMap = createDoubleLink()
+        pairLinkedMap = createDoubleLink(this.list)
         listCod1cInvent = createListPair(this.list).toList()
     }
 
@@ -57,6 +60,39 @@ class JsonDownloader(private val path : InputStream) {
     /**Получаем список CardInventory**/
     fun getList() : List<CardInventory> = this.list
 
+    fun updateIndexList() {
+        this.list.forEachIndexed { index, cardInventory ->
+            cardInventory.index = index
+        }
+        max = this.list.last().index
+        flag_index = true
+    }
+
+    fun updateListAfterIndex(context : Context) {
+        if(flag_index){
+        val fileDir = context.filesDir
+        val file = File(fileDir,"jso.json")
+        val gson = GsonBuilder()
+            .serializeNulls()
+            .create()
+        val str = gson.toJson(this.list)
+
+        val cacheDir = context.cacheDir
+       File(cacheDir,"max.txt")
+        if(max > 0){
+            FileWriter(File(cacheDir,"max.txt")).use {
+                it.write(max.toString())
+                it.flush()
+            }
+        }
+
+       FileOutputStream(file).use {
+           it.write(str.toByteArray())
+           it.flush()
+            }
+        }
+    }
+
     /** Получаем "связанный" список invetNumber(Инвентарный номер) -> CardInventory**/
     fun getLinkedList() : Map<String?, CardInventory> = this.linkedMap
 
@@ -73,7 +109,7 @@ class JsonDownloader(private val path : InputStream) {
 
     fun getPairLinkedMap() : Map<Pair<String,String>, CardInventory> = this.pairLinkedMap
     /**создает "связанный" список(map) в виде Pair<inventNumb,cod1C>(пара инвентарного номера и кода 1с) -> CardInventory**/
-    private fun createDoubleLink() : Map<Pair<String,String>, CardInventory> {
+    private fun createDoubleLink(list : List<CardInventory>) : Map<Pair<String,String>, CardInventory> {
         val startPairLinkerMap = mutableMapOf<Pair<String,String>, CardInventory>()
 
         var lists : MutableList<CardInventory> = mutableListOf()

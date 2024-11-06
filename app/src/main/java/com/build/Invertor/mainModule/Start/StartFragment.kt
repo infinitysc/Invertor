@@ -215,12 +215,16 @@ class StartFragment  : Fragment(){
     private fun installJsonFile(fileName : String = "jso.json") : JsonDownloader? {
         try {
             val inputStream = requireContext().openFileInput(fileName)
-            return JsonDownloader(inputStream)
+            return JsonDownloader(inputStream).apply {
+                this.updateIndexList()
+                this.updateListAfterIndex(requireContext())
+            }
         }  catch (e : Exception){
             e.printStackTrace()
             return null
         }
     }
+
     private fun createListUserName(data : DataDownloader) : List<String> {
         val tempMap = data.getList()!!
         val tempList = mutableListOf<String>()
@@ -291,7 +295,7 @@ class StartFragment  : Fragment(){
                         Toast.makeText(requireContext(),"Введите кабинет(окно)",Toast.LENGTH_SHORT).show()
                     }
                     else {
-                        this.cacheMax()
+                        //this.cacheMax()
                         val singleUser = searchUser()
                         val newAbsUser = NewUser(singleUser,cabinetEditor.text.toString(),spinAdr)
                         if(singleUser != null){

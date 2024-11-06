@@ -2,6 +2,7 @@ package com.build.Invertor.model.json
 
 
 data class CardInventory(
+    var index : Int ,
     var SID : Int ,
     var UEID : Int? ,
     var UEDescription : String?,

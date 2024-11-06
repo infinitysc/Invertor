@@ -32,6 +32,7 @@ import com.journeyapps.barcodescanner.BarcodeView
 import com.journeyapps.barcodescanner.DefaultDecoderFactory
 import java.io.File
 import java.io.FileOutputStream
+import java.io.FileWriter
 import java.io.IOException
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
@@ -45,6 +46,7 @@ import java.time.format.DateTimeFormatter
  * **/
 class CardFragment : Fragment(){
 
+    private var max : Int = 0
     private val sound : MediaPlayer by lazy { MediaPlayer.create(requireContext(),R.raw.scanner_beep) }
     private var user : NewUser? = null
     private var card : CardInventory? = null
@@ -126,6 +128,16 @@ class CardFragment : Fragment(){
 
     }
 
+    private fun getMax() : Int {
+        val file = File(requireContext().cacheDir,"max.txt")
+        return file.readText().toInt()
+    }
+    private fun updateMax(){
+        FileWriter(File(requireContext().cacheDir,"max.txt")).use {
+            it.write((max).toString()) //?
+            it.flush()
+        }
+    }
     private fun alert() : AlertDialog{
         var value = ""
         val dialogView = LayoutInflater.from(requireContext()).inflate(R.layout.serial_camera_layout,null)
@@ -207,6 +219,7 @@ class CardFragment : Fragment(){
         }
 
         saveButton.setOnClickListener(){
+            max = getMax()
             if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU){
                 var change = 0
                 oldSnNumber = sNEditor.text.toString()
@@ -221,7 +234,7 @@ class CardFragment : Fragment(){
                     status = itemSelected,
                     change = change,
                     cabinet = this.user!!.cabinet.toString(), // заглушка
-                    note = ps.text.toString()
+                    note = ps.text.toString(),
                 )
                 val gson = Gson()
                 saveJsonString = gson.toJson(saveCard)
@@ -250,7 +263,7 @@ class CardFragment : Fragment(){
                         status = itemSelected,
                         change = change,
                         cabinet = this.user!!.cabinet.toString(),
-                        note = ps.text.toString()
+                        note = ps.text.toString(),
                     )
                     val gson = Gson()
                     saveJsonString = gson.toJson(saveCard)
@@ -295,7 +308,7 @@ class CardFragment : Fragment(){
                 status = itemSelected,
                 change = change,
                 cabinet = this.user!!.cabinet.toString(),
-                note = ps.text.toString()
+                note = ps.text.toString(),
             )
             if(papaCard.UEID == null){
                 Toast.makeText(requireContext(),"Из дочернего обьекта сделать дочерний невозможно!",Toast.LENGTH_SHORT).show()
@@ -330,7 +343,7 @@ class CardFragment : Fragment(){
             val listData = gsonEngine.fromJson<List<CardInventory>>(file.readText(),type)
 
             for(i in listData.iterator()){
-                if(i.UEID == card.UEID){
+                if(i.index == card.index){
                     reWrite(i,card)
                 }
             }
@@ -371,7 +384,7 @@ class CardFragment : Fragment(){
         }
 
         for (i in work.iterator()) {
-            if (i.UEID == newCard.UEID) {
+            if (i.index == newCard.index) {
                 reWrite(i, newCard)
             }
         }
@@ -443,10 +456,11 @@ class CardFragment : Fragment(){
         status : String,
         change : Int,
         cabinet : String,
-        note : String
+        note : String,
         ) : CardInventory {
-
+        this.max = getMax()
         return CardInventory(
+            index = card?.index!!,
             SID = card!!.SID,
             UEID = card.UEID,
             UEDescription = card.UEDescription,
@@ -461,7 +475,9 @@ class CardFragment : Fragment(){
             Cabinet = cabinet,
             Cod1C = card.Cod1C,
             parentEqueipment = card.parentEqueipment
-        )
+        ).apply {
+            updateMax()
+        }
     }
 
 

@@ -4,7 +4,6 @@ import android.app.AlertDialog
 import android.content.Context
 import android.media.MediaPlayer
 import android.os.Bundle
-import android.util.EventLogTags
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -12,7 +11,6 @@ import android.view.ViewGroup
 import android.widget.*
 import android.widget.AdapterView.OnItemSelectedListener
 import androidx.appcompat.widget.SwitchCompat
-import androidx.core.content.ContentProviderCompat.requireContext
 import androidx.fragment.app.Fragment
 import com.build.Invertor.R
 import com.build.Invertor.model.NewUser
@@ -43,9 +41,10 @@ class BabyCardFragment : Fragment() {
     private lateinit var tap: Button
     private lateinit var inputLayoyt: TextInputLayout
 
+
     private var papa: NewUser? = null
     private var papaCard: CardInventory? = null
-    private var max = 0
+    private var max : Int = 0
     private val sound: MediaPlayer by lazy {
         MediaPlayer.create(
             requireContext(),
@@ -122,6 +121,7 @@ class BabyCardFragment : Fragment() {
                 0
             }
             val newBabyCard = CardInventory(
+                index = max+1,
                 SID =  papaCard?.SID!!,
                 UEID = null ,
                 UEDescription = if(first.text.toString() == ""){null}else {first.text.toString()},
@@ -190,7 +190,7 @@ class BabyCardFragment : Fragment() {
             val listData = gsonEngine.fromJson<List<CardInventory>>(file.readText(),type)
 
             for(i in listData.iterator()){
-                if(i.UEID == card.UEID){
+                if(i.index == card.index){
                     reWrite(i,card)
                 }
             }
@@ -212,7 +212,7 @@ class BabyCardFragment : Fragment() {
 
     private fun childHasInJsonFile(list : List<CardInventory>,newCard: CardInventory) : Boolean{
         for (i in list.iterator()){
-            if(i.UEID == newCard.UEID){
+            if(i.index == newCard.index){
                 return true
             }
         }
@@ -317,6 +317,7 @@ class BabyCardFragment : Fragment() {
     }
 
     private fun reWrite(oldCard : CardInventory,newCard : CardInventory) : CardInventory {
+        oldCard.index = newCard.index
         oldCard.SID = newCard.SID
         oldCard.UEDescription = newCard.UEDescription
         oldCard.ActionDateTime = newCard.ActionDateTime
@@ -372,7 +373,7 @@ class BabyCardFragment : Fragment() {
     }
     private fun updateMax(){
         FileWriter(File(requireContext().cacheDir,"max.txt")).use {
-            it.write((max + 1).toString()) //?
+            it.write((max).toString()) //?
             it.flush()
         }
     }
