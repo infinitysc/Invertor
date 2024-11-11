@@ -54,6 +54,8 @@ class CameraFragment : Fragment(){
     private lateinit var barcodeView : BarcodeView
     private lateinit var switch : SwitchCompat
 
+    private lateinit var refresh : ImageView
+
     private val sound : MediaPlayer by lazy { MediaPlayer.create(requireContext(),R.raw.scanner_beep) }
 
     private var singleList : NewUser? = null
@@ -65,10 +67,10 @@ class CameraFragment : Fragment(){
         BarcodeFormat.CODE_93,
         BarcodeFormat.EAN_13,
         BarcodeFormat.EAN_8,
-        BarcodeFormat.CODABAR,
-        BarcodeFormat.UPC_E,
-        BarcodeFormat.UPC_A,
-        BarcodeFormat.UPC_EAN_EXTENSION
+       // BarcodeFormat.CODABAR,
+       // BarcodeFormat.UPC_E,
+       // BarcodeFormat.UPC_A,
+       // BarcodeFormat.UPC_EAN_EXTENSION
     )
     private val activityFragmentManager : FragmentManager by lazy { activity?.supportFragmentManager!! }
     private val listInCode : List<String> by lazy  {jsonDownloader?.getListCode()!!}
@@ -98,6 +100,7 @@ class CameraFragment : Fragment(){
         barcodeView = view.findViewById(R.id.barcode_view)
         switch = view.findViewById(R.id.switch_torch)
 
+        refresh = view.findViewById(R.id.refreshButton)
         userText.text = singleList!!.user?.userName
         barcodeView.decoderFactory = DefaultDecoderFactory(formats)
         barcodeView.decodeContinuous(callback)
@@ -146,6 +149,12 @@ class CameraFragment : Fragment(){
         updateData()
 
         barcodeView.resume()
+
+        refresh.setOnClickListener{
+            barcodeView.pause()
+            barcodeView.resume()
+            valueText.setText("")
+        }
 
         switch.setOnCheckedChangeListener{_ , isCheked ->
             Log.d("Scanner","фонарик $this")

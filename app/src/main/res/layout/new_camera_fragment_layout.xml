@@ -76,4 +76,14 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/noteValue" />
 
+    <ImageView
+        android:id="@+id/refreshButton"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_marginTop="40dp"
+        android:layout_marginEnd="16dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/value"
+        app:srcCompat="@drawable/icons8_refresh_32" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

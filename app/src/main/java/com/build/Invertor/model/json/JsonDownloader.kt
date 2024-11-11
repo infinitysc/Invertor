@@ -5,6 +5,7 @@ import android.util.Log
 
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
+import com.google.gson.JsonSyntaxException
 import com.google.gson.reflect.TypeToken
 import java.io.File
 import java.io.FileOutputStream
@@ -37,7 +38,7 @@ class JsonDownloader(private val path : InputStream) {
     init {
         val jsonString = changeToString(path)
         val typeOfList = object : TypeToken<List<CardInventory>>() {}.type
-        list = gson.fromJson<List<CardInventory>?>(jsonString,typeOfList)
+        list = gson.fromJson<List<CardInventory>?>(jsonString,typeOfList) // if single string not an array -> jsonStr
         linkedMap = createLink(this.list)
         pairLinkedMap = createDoubleLink(this.list)
         listCod1cInvent = createListPair(this.list).toList()

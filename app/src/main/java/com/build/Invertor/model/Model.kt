@@ -44,6 +44,9 @@ class Model constructor()
         this.context = context
         this.jsonDownloader = jsonDownloader
         this.dataDownloader = dataDownloader
+
+
+
     }
 
 
@@ -120,7 +123,10 @@ class Model constructor()
     }
 
 
-    private fun reWriteCard_Opt(index : Int,card : CardInventory) {}
+    private fun reWriteCard_Opt(index : Int,card : CardInventory) {
+
+
+    }
 
     private fun fileToList(file : File) : List<CardInventory> = this.gsonEngine.fromJson<List<CardInventory>>(file.readText(),this.typeTemplate)
 
@@ -220,24 +226,6 @@ class Model constructor()
     }
 
 
-    /*class SettingsModel(private val context : Context) {
-
-        //private val exportJsonLauncher
-        //private val importJsonLauncher
-        fun importJsonFile(){
-
-
-
-        }
-        fun exportJsonFile(){
-
-        }
-
-        fun exportExcelFile(){
-
-        }
-
-    }*/
 
 
 

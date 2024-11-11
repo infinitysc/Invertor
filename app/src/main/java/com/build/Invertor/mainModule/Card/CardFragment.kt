@@ -236,9 +236,9 @@ class CardFragment : Fragment(){
                     cabinet = this.user!!.cabinet.toString(), // заглушка
                     note = ps.text.toString(),
                 )
-                val gson = Gson()
+                /*val gson = Gson()
                 saveJsonString = gson.toJson(saveCard)
-                //workWithCache()
+                workWithCache()*/
                 reSaveDataFile(saveCard!!)
                 if(nameFile != ""){
                     getCacheFileToReWrite(nameFile,saveCard!!)
@@ -265,9 +265,9 @@ class CardFragment : Fragment(){
                         cabinet = this.user!!.cabinet.toString(),
                         note = ps.text.toString(),
                     )
-                    val gson = Gson()
+                    /*val gson = Gson()
                     saveJsonString = gson.toJson(saveCard)
-                    //workWithCache() // можно булеан знач дать чтобы если ничего не вышло вернуло фалсе и карточка свободная мб
+                    workWithCache() // можно булеан знач дать чтобы если ничего не вышло вернуло фалсе и карточка свободная мб*/
                     reSaveDataFile(saveCard!!)
                     if(nameFile != ""){
                         getCacheFileToReWrite(nameFile,saveCard!!)
@@ -402,6 +402,7 @@ class CardFragment : Fragment(){
      }
 
     }
+    //нужно сократить перезаписываемых действий
     private fun reWrite(oldCard : CardInventory,newCard : CardInventory) : CardInventory {
         oldCard.SID = newCard.SID
         oldCard.UEDescription = newCard.UEDescription
@@ -461,7 +462,7 @@ class CardFragment : Fragment(){
         this.max = getMax()
         return CardInventory(
             index = card?.index!!,
-            SID = card!!.SID,
+            SID = card.SID,
             UEID = card.UEID,
             UEDescription = card.UEDescription,
             ActionDateTime = date,
