@@ -2,6 +2,7 @@ package com.build.Invertor.mainModule.SingleActivity
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import androidx.activity.enableEdgeToEdge
 import com.build.Invertor.R
 import com.build.Invertor.debug.DebugLogger
 import com.build.Invertor.debug.DebugSharedInterface
@@ -17,7 +18,7 @@ class MainActivity : AppCompatActivity(), ModelSharedInterface,DebugSharedInterf
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.hub_layout)
-
+        //enableEdgeToEdge()
 
         val mainFragment = StartFragment()
         fragmentSupp.beginTransaction()
@@ -26,21 +27,14 @@ class MainActivity : AppCompatActivity(), ModelSharedInterface,DebugSharedInterf
     }
 
     override fun getModel(): Model? {
-        return this.model
+        return null
     }
 
     override fun haveFiles(): Boolean {
-        return this.model?.checkFiles() ?: false
+        return false
     }
 
     override fun updateModel(flag : Boolean) {
-
-        if(flag == true){
-            this.model = Model.getModel(mContexnt = applicationContext)
-        }
-        else{
-
-        }
 
     }
 
