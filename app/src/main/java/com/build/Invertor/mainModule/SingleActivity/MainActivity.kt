@@ -4,7 +4,6 @@ import android.content.Context
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import androidx.activity.enableEdgeToEdge
-import androidx.navigation.fragment.NavHostFragment
 import com.build.Invertor.R
 import com.build.Invertor.mainModule.Start.StartFragment
 import com.build.Invertor.model.Model
@@ -19,8 +18,8 @@ class MainActivity : AppCompatActivity(), ModelSharedInterface{
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.hub_layout)
-
         val mainFragment = StartFragment()
+
         fragmentSupp.beginTransaction()
             .replace(R.id.mainFrameLayout,mainFragment)
             .commit()
