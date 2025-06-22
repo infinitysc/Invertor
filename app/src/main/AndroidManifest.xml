@@ -19,12 +19,12 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Invertor"
         tools:targetApi="31"
-        android:name = ".mainModule.OLD.App"
+        android:name = "com.build.invertor.mainModule.application.App"
         >
 
 
         <activity
-            android:name=".mainModule.SingleActivity.MainActivity"
+            android:name="com.build.invertor.mainModule.singleActivity.MainActivity"
             android:screenOrientation="portrait"
             android:exported="true">
             <intent-filter>

@@ -7,7 +7,7 @@
 
     <fragment
         android:id="@+id/settings"
-        android:name="com.build.Invertor.mainModule.Settings.Settings"
+        android:name="com.build.invertor.mainModule.settings.Settings"
         android:label="Settings" >
         <action
             android:id="@+id/action_settings_pop"
@@ -16,7 +16,7 @@
     </fragment>
     <fragment
         android:id="@+id/startFragment"
-        android:name="com.build.Invertor.mainModule.Start.StartFragment"
+        android:name="com.build.invertor.mainModule.start.StartFragment"
         android:label="StartFragment" >
         <action
             android:id="@+id/action_startFragment_to_settings"
@@ -27,7 +27,7 @@
     </fragment>
     <fragment
         android:id="@+id/listChoiceFragment"
-        android:name="com.build.Invertor.mainModule.ListCho.ListChoiceFragment"
+        android:name="com.build.invertor.mainModule.listFragment.ListChoiceFragment"
         android:label="ListChoiceFragment" >
         <action
             android:id="@+id/action_listChoiceFragment_to_cardFragment"
@@ -39,7 +39,7 @@
     </fragment>
     <fragment
         android:id="@+id/cardFragment"
-        android:name="com.build.Invertor.mainModule.Card.CardFragment"
+        android:name="com.build.invertor.mainModule.Card.CardFragment"
         android:label="CardFragment" >
         <action
             android:id="@+id/action_cardFragment_to_babyCardFragment"
@@ -51,7 +51,7 @@
     </fragment>
     <fragment
         android:id="@+id/babyCardFragment"
-        android:name="com.build.Invertor.mainModule.Card.BabyCardFragment"
+        android:name="com.build.invertor.mainModule.Card.BabyCardFragment"
         android:label="BabyCardFragment" >
         <action
             android:id="@+id/action_babyCardFragment_pop"
@@ -60,7 +60,7 @@
     </fragment>
     <fragment
         android:id="@+id/cameraFragment"
-        android:name="com.build.Invertor.mainModule.camera.CameraFragment"
+        android:name="com.build.invertor.mainModule.camera.CameraFragment"
         android:label="CameraFragment" >
         <action
             android:id="@+id/action_cameraFragment_to_listChoiceFragment"
