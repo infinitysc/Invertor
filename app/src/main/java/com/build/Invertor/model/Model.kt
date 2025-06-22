@@ -166,7 +166,7 @@ class Model constructor()
     fun searchCards(code : String) : List<CardInventory>{ //need Update?
         val mutList : MutableList<CardInventory> = mutableListOf()
 
-        val mapTemp = this.jsonDownloader?.exp_createDoubleLink()
+        val mapTemp = this.jsonDownloader?.getxDoubleLink()
 
         if(mapTemp != null){
             for(item in mapTemp.iterator()){

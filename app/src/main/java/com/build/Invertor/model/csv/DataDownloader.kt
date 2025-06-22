@@ -5,50 +5,52 @@ import android.renderscript.ScriptGroup.Input
 import android.util.Log
 import org.apache.poi.ss.usermodel.*
 import org.apache.poi.xssf.usermodel.XSSFWorkbook
+import org.jetbrains.annotations.TestOnly
 import java.io.File
 import java.io.FileInputStream
 import java.io.FileWriter
 import java.io.InputStream
 
-class DataDownloader(private val path : InputStream,private val mContext: Context? = null) {
-
+class DataDownloader(
+    private val path : InputStream,
+    private val mContext: Context? = null
+) {
     private val workBook : Workbook
-    private var list : MutableList<User> = mutableListOf()
+    private val list : MutableList<User> = mutableListOf()
 
     init {
-
         workBook = XSSFWorkbook(path)
         inExcel(workSheet = workBook.getSheetAt(0),mContext)
     }
 
     private fun inExcel(workSheet : Sheet,mContext : Context? = null) {
-        val iter = workSheet.iterator()
-        while (iter.hasNext()){
-            val str = checkStringInFile(iter.next())
-            //experimental
+        val iterator = workSheet.iterator()
+
+        while (iterator.hasNext()){
+            val str = checkStringInCell(iterator.next().getCell(0))
+
             if(str != ""){
                 val listEditedString = regexSplitterString(str)
-                if(listEditedString.isNotEmpty()){
-                    /*val debFun :(list : List<String>) -> String = {
-                        var strings = ""
-                        it.forEach(){
-                            strings="$str,$it"
-                        }
-                        strings
-                    }*/
-                    //Log.d("DataWork","${debFun.invoke(listEditedString)}")
-                    addToList(createUser(listEditedString[0].toInt(),listEditedString[1],listEditedString[2]))
 
+                if(listEditedString.isNotEmpty()){
+                    list.add(User(
+                        listEditedString[0].toInt(),
+                        listEditedString[1],
+                        listEditedString[2]
+                    ))
                 }
             }
-            //stable(use in last Updates(0.1.5.A)
-            /*
-            if(str != ""){
-                val listEditedString = editStr(str)
-                addToList(createUser(listEditedString[0].toInt(),listEditedString[1],listEditedString[2]))
-            }*/
         }
     }
+
+    private fun checkStringInCell(cell : Cell) : String{
+        return when(cell.cellType) {
+            CellType.STRING -> cell.stringCellValue
+            CellType.NUMERIC -> cell.numericCellValue.toString()
+            else -> cell.stringCellValue ?: ""
+        }
+    }
+
     private fun checkStringInFile(row : Row, cell : Cell = row.getCell(0)) : String {
         return if(cell.stringCellValue is String && cell.stringCellValue.isNotEmpty()) {
             return cell.stringCellValue
@@ -57,28 +59,12 @@ class DataDownloader(private val path : InputStream,private val mContext: Contex
             cell.numericCellValue.toString()
         }
     }
-    private fun delete(str : String) : String {
-        var newStr = str.replace("\"","").also {
-            it.replace("(КВОТА-ИНВАЛИД)","")
-            it.replace(" (КВОТА - ИНВАЛИД) ","")
-        }
-        return newStr
-    }
-    private fun editStr(str: String) : List<String> {
-        val newList : MutableList<String> =splitterString(str)
-        newList.forEach() {
-            it.replace("\"","")
-            it.replace("(КВОТА-ИНВАЛИД)","")
-        }
 
-        return newList
-    }
-
-    //дебаг версия нового делителя , из startFragment в будущем (если там она еще осталась) улетит в тестирование
+    @TestOnly
     fun debugStr(str : String,mContext : Context) {
         val newList = regexSplitterString(str)
-
         val file = File(mContext.cacheDir,"debugData.txt")
+
         FileWriter(file).use { writer ->
             writer.write(newList.size.toString())
             writer.write("\n")
@@ -90,13 +76,7 @@ class DataDownloader(private val path : InputStream,private val mContext: Contex
         }
     }
 
-    //плохо делит
-    private fun splitterString(str : String ) : MutableList<String> {
-        return str.split(",").toMutableList()
-    }
-
     private fun regexSplitterString(str : String ) : MutableList<String>{
-
         val regex = Regex("(\\d+),\"(.*?)\",\"(.*?)\"")
         val result = regex.find(str)
         if(result!=null){
@@ -108,34 +88,25 @@ class DataDownloader(private val path : InputStream,private val mContext: Contex
     }
 
     fun getList() : List<User>?  {
-        return if(this.list.isNotEmpty()) {
-            this.list
-        } else {
+        return this.list.ifEmpty {
             null
         }
     }
 
     fun createLinkedMap() : Map<String,User> {
-        var tempMap = mutableMapOf<String,User>()
+        val tempMap = mutableMapOf<String,User>()
         for(i in this.list.iterator()) {
-            tempMap.put(i.userName,i)
+            tempMap[i.userName] = i
         }
         return tempMap
     }
 
-    fun createIdLinkedMao() : Map<String,User>{
+    fun createIdLinkedMap() : Map<String,User>{
         val tempMap = mutableMapOf<String,User>()
         for(i in this.list.iterator()){
-            tempMap.put(i.id.toString(),i)
+            tempMap[i.id.toString()] = i
         }
         return tempMap
-    }
-    private fun addToList(user : User) {
-        this.list.add(user)
-    }
-
-     private fun createUser(id : Int , userName : String , departament : String) : User {
-        return User(id,userName,departament)
     }
 
 }

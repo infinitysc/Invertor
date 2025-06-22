@@ -30,6 +30,7 @@ import com.google.zxing.BarcodeFormat
 import com.journeyapps.barcodescanner.BarcodeCallback
 import com.journeyapps.barcodescanner.BarcodeView
 import com.journeyapps.barcodescanner.DefaultDecoderFactory
+import org.jetbrains.annotations.TestOnly
 import java.io.File
 import java.io.FileOutputStream
 import java.io.FileWriter
@@ -54,7 +55,7 @@ class CardFragment : Fragment(){
     private lateinit var activityContext : Context
     private lateinit var adress : TextView
     private lateinit var dest : TextView
-    private lateinit var sNEditor : TextInputEditText
+    private lateinit var serNumberEditor : TextInputEditText
     private lateinit var spinnerStatus : Spinner
     private lateinit var userWidget : TextView
     private lateinit var ps : TextInputEditText
@@ -93,7 +94,7 @@ class CardFragment : Fragment(){
 
         adress = view.findViewById(R.id.adress)
         dest = view.findViewById(R.id.description)
-        sNEditor = view.findViewById(R.id.serialNumberEdit)
+        serNumberEditor = view.findViewById(R.id.serialNumberEdit)
         spinnerStatus = view.findViewById(R.id.spinnerStatus)
         userWidget = view.findViewById(R.id.user)
         ps = view.findViewById(R.id.PSEditor)
@@ -112,7 +113,7 @@ class CardFragment : Fragment(){
             spinnerStatus.setSelection(listSpin.indexOf("В эксплуатации"))
         }
 
-        sNEditor.setText(card?.SerialNumb)
+        serNumberEditor.setText(card?.SerialNumb)
 
         ps.setText(card?.Description)
 
@@ -181,7 +182,7 @@ class CardFragment : Fragment(){
             .setCancelable(true)
             .setPositiveButton("ок"){dialog, which ->
                 if(value != ""){
-                    sNEditor.setText(value)
+                    serNumberEditor.setText(value)
                 }
                 dialog.dismiss()
             }
@@ -222,14 +223,14 @@ class CardFragment : Fragment(){
             max = getMax()
             if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU){
                 var change = 0
-                oldSnNumber = sNEditor.text.toString()
+                oldSnNumber = serNumberEditor.text.toString()
                 if(oldSnNumber != ""){
                     change = 1
                 }
                 saveCard = createEditedCard(
                     user = this.user!!,
                     card = this.card,
-                    newSerialNumberString = sNEditor.text.toString(),
+                    newSerialNumberString = serNumberEditor.text.toString(),
                     "${getCurrentTime()}+03",
                     status = itemSelected,
                     change = change,
@@ -251,14 +252,14 @@ class CardFragment : Fragment(){
                 }
                 else {
                     var change = 0
-                    oldSnNumber = sNEditor.text.toString()
+                    oldSnNumber = serNumberEditor.text.toString()
                     if(oldSnNumber != ""){
                         change = 1
                     }
                     saveCard = createEditedCard(
                         user = this.user!!,
                         card = this.card,
-                        newSerialNumberString = sNEditor.text.toString(),
+                        newSerialNumberString = serNumberEditor.text.toString(),
                         "${getCurrentTime()}+03",
                         status = itemSelected,
                         change = change,
@@ -295,15 +296,16 @@ class CardFragment : Fragment(){
              *
              * */
 
+
             var change = 0
-            oldSnNumber = sNEditor.text.toString()
+            oldSnNumber = serNumberEditor.text.toString()
             if(oldSnNumber != ""){
                 change = 1
             }
             val papaCard = createEditedCard(
                 user = this.user!!,
                 card = this.card,
-                newSerialNumberString = sNEditor.text.toString(),
+                newSerialNumberString = serNumberEditor.text.toString(),
                 "${getCurrentTime()}+03",
                 status = itemSelected,
                 change = change,
@@ -501,4 +503,6 @@ class CardFragment : Fragment(){
             return newFragment
         }
     }
+
+
 }

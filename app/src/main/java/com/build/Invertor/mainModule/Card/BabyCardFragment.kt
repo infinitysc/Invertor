@@ -33,14 +33,12 @@ import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
 class BabyCardFragment : Fragment() {
-
     private lateinit var first: TextInputEditText
     private lateinit var second: TextInputEditText
     private lateinit var thrid: TextInputEditText
     private lateinit var spinner: Spinner
     private lateinit var tap: Button
     private lateinit var inputLayoyt: TextInputLayout
-
 
     private var papa: NewUser? = null
     private var papaCard: CardInventory? = null
@@ -80,14 +78,13 @@ class BabyCardFragment : Fragment() {
         spinner = view.findViewById(R.id.spinn)
         tap = view.findViewById(R.id.tapButton)
         inputLayoyt = view.findViewById(R.id.testL)
-
         spinner.adapter = ArrayAdapter(requireContext(), R.layout.spinner, listSpin)
-
         spinner.setSelection(listSpin.indexOf("В эксплуатации"))
 
         inputLayoyt.setEndIconOnClickListener {
             alert().show()
         }
+
 
     }
 
@@ -95,7 +92,6 @@ class BabyCardFragment : Fragment() {
         super.onStart()
 
         alert()
-
         spinner.onItemSelectedListener = object : OnItemSelectedListener {
             override fun onItemSelected(
                 parent: AdapterView<*>?,
@@ -112,8 +108,6 @@ class BabyCardFragment : Fragment() {
         }
 
         tap.setOnClickListener {
-            //papa user
-            //papaCard card
             max = getMax()
             val change = if(second.text.toString() != ""){
                 1
@@ -157,6 +151,7 @@ class BabyCardFragment : Fragment() {
         }
 
     }
+
     private fun addToEndJsonFile(newCard : CardInventory) { // потом поменяю
         val file = File(requireContext().filesDir,"jso.json")
         val gsonBuilder = GsonBuilder()
@@ -176,7 +171,6 @@ class BabyCardFragment : Fragment() {
             e.printStackTrace()
             Log.e("FileError","$this")
         }
-        //}
     }
 
     private fun getCacheFileToReWrite(fileNameFromCache : String,card : CardInventory) {
@@ -225,7 +219,6 @@ class BabyCardFragment : Fragment() {
         return dateTime.format(formatter)
     }
 
-    //достаточно дорогое действие? создавать каждый раз экземпляр barcodeView
     private fun alert(): AlertDialog {
         var value = ""
         val dialogView =
