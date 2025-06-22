@@ -326,22 +326,7 @@ class BabyCardFragment : Fragment() {
         return oldCard
     }
 
-    private fun createListUserName(data: DataDownloader): List<String> {
-        val tempMap = data.getList()!!
-        val tempList = mutableListOf<String>()
-        for (i in tempMap.iterator()) {
-            tempList.add(delete(i.userName))
-        }
-        return tempList
-    }
 
-    private fun delete(str: String): String {
-        var newStr = str.replace("\"", "").also {
-            it.replace(" (КВОТА-ИНВАЛИД)", "")
-            it.replace(" (КВОТА - ИНВАЛИД) ", "")
-        }
-        return newStr
-    }
 
     fun setCard(card: CardInventory) {
         this.papaCard = card
