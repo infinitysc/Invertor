@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/navigation"
+    app:startDestination="@id/startFragment">
+
+    <fragment
+        android:id="@+id/settings"
+        android:name="com.build.Invertor.mainModule.Settings.Settings"
+        android:label="Settings" >
+        <action
+            android:id="@+id/action_settings_pop"
+            app:popUpTo="@id/settings"
+            app:popUpToInclusive="true" />
+    </fragment>
+    <fragment
+        android:id="@+id/startFragment"
+        android:name="com.build.Invertor.mainModule.Start.StartFragment"
+        android:label="StartFragment" >
+        <action
+            android:id="@+id/action_startFragment_to_settings"
+            app:destination="@id/settings" />
+        <action
+            android:id="@+id/action_startFragment_to_cameraFragment"
+            app:destination="@id/cameraFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/listChoiceFragment"
+        android:name="com.build.Invertor.mainModule.ListCho.ListChoiceFragment"
+        android:label="ListChoiceFragment" >
+        <action
+            android:id="@+id/action_listChoiceFragment_to_cardFragment"
+            app:destination="@id/cardFragment" />
+        <action
+            android:id="@+id/action_listChoiceFragment_pop"
+            app:popUpTo="@id/listChoiceFragment"
+            app:popUpToInclusive="true" />
+    </fragment>
+    <fragment
+        android:id="@+id/cardFragment"
+        android:name="com.build.Invertor.mainModule.Card.CardFragment"
+        android:label="CardFragment" >
+        <action
+            android:id="@+id/action_cardFragment_to_babyCardFragment"
+            app:destination="@id/babyCardFragment" />
+        <action
+            android:id="@+id/action_cardFragment_pop"
+            app:popUpTo="@id/cardFragment"
+            app:popUpToInclusive="true" />
+    </fragment>
+    <fragment
+        android:id="@+id/babyCardFragment"
+        android:name="com.build.Invertor.mainModule.Card.BabyCardFragment"
+        android:label="BabyCardFragment" >
+        <action
+            android:id="@+id/action_babyCardFragment_pop"
+            app:popUpTo="@id/babyCardFragment"
+            app:popUpToInclusive="true" />
+    </fragment>
+    <fragment
+        android:id="@+id/cameraFragment"
+        android:name="com.build.Invertor.mainModule.camera.CameraFragment"
+        android:label="CameraFragment" >
+        <action
+            android:id="@+id/action_cameraFragment_to_listChoiceFragment"
+            app:destination="@id/listChoiceFragment" />
+        <action
+            android:id="@+id/action_cameraFragment_to_cardFragment"
+            app:destination="@id/cardFragment" />
+        <action
+            android:id="@+id/action_cameraFragment_pop"
+            app:popUpTo="@id/cameraFragment"
+            app:popUpToInclusive="true" />
+    </fragment>
+</navigation>
