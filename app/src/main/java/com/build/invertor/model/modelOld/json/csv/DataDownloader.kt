@@ -1,4 +1,4 @@
-package com.build.invertor.model.csv
+package com.build.invertor.model.modelOld.json.csv
 
 import android.content.Context
 import org.apache.poi.ss.usermodel.*
@@ -10,7 +10,7 @@ import java.io.InputStream
 
 class DataDownloader(
     private val path : InputStream,
-) {
+) : DataExcel {
     private val workBook : Workbook
     private val list : MutableList<User> = mutableListOf()
 
@@ -29,11 +29,13 @@ class DataDownloader(
                 val listEditedString = regexSplitterString(str)
 
                 if(listEditedString.isNotEmpty()){
-                    list.add(User(
+                    list.add(
+                        User(
                         listEditedString[0].toInt(),
                         listEditedString[1],
                         listEditedString[2]
-                    ))
+                    )
+                    )
                 }
             }
         }
@@ -44,15 +46,6 @@ class DataDownloader(
             CellType.STRING -> cell.stringCellValue
             CellType.NUMERIC -> cell.numericCellValue.toString()
             else -> cell.stringCellValue ?: ""
-        }
-    }
-
-    private fun checkStringInFile(row : Row, cell : Cell = row.getCell(0)) : String {
-        return if(cell.stringCellValue is String && cell.stringCellValue.isNotEmpty()) {
-            return cell.stringCellValue
-        } else if(cell.stringCellValue.isEmpty()){""}
-        else{
-            cell.numericCellValue.toString()
         }
     }
 
@@ -68,22 +61,22 @@ class DataDownloader(
         }
     }
 
-    fun getList() : List<User>?  {
+    override fun getList() : List<User>?  {
         return this.list.ifEmpty {
             null
         }
     }
 
-    fun createLinkedMap() : Map<String,User> {
-        val tempMap = mutableMapOf<String,User>()
+    override fun createLinkedMap() : Map<String, User> {
+        val tempMap = mutableMapOf<String, User>()
         for(i in this.list.iterator()) {
             tempMap[i.userName] = i
         }
         return tempMap
     }
 
-    fun createIdLinkedMap() : Map<String,User>{
-        val tempMap = mutableMapOf<String,User>()
+    override fun createIdLinkedMap() : Map<String, User>{
+        val tempMap = mutableMapOf<String, User>()
         for(i in this.list.iterator()){
             tempMap[i.id.toString()] = i
         }

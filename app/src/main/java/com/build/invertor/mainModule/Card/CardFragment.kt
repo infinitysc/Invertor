@@ -19,8 +19,8 @@ import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import com.build.Invertor.R
-import com.build.invertor.model.csv.NewUser
-import com.build.invertor.model.json.CardInventory
+import com.build.invertor.model.modelOld.json.csv.NewUser
+import com.build.invertor.model.modelOld.json.CardInventory
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
 import com.google.gson.GsonBuilder
@@ -57,19 +57,29 @@ class CardFragment : Fragment(){
     private lateinit var oldUser : TextView
     private lateinit var inventNumb : TextView
 
+    // controller
     private var max : Int = 0
+
     private val sound : MediaPlayer by lazy { MediaPlayer.create(requireContext(),R.raw.scanner_beep) }
+
+    // controller
     private var user : NewUser? = null
     private var card : CardInventory? = null
     private var saveJsonString : String = ""
+
+
     private var saveCard : CardInventory? = null
     private var itemSelected : String = ""
     private val listSpin = listOf<String>("","В эксплуатации","Требуется ремонт","Находится на консервации",
         "Не соответствует требованиям эксплуатации","Не введен в эксплуатацию","Списание","Утилизация")
     private var oldSnNumber : String = ""
+    // controller
     private var nameFile = "" // this is fileName from bundle(ListChoiceFragment) cameraFragment set null into bundle
+
+    //delete
     private val activityFragmentManager : FragmentManager by lazy { activity?.supportFragmentManager!! }
 
+    //delete
     override fun onAttach(context: Context) {
         super.onAttach(context)
         this.activityContext = context
@@ -83,6 +93,8 @@ class CardFragment : Fragment(){
         return inflater.inflate(R.layout.card_tech_layout,container,false)
     }
 
+
+    //переименовать все имена переменных на более контекстные
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
@@ -91,7 +103,7 @@ class CardFragment : Fragment(){
         serNumberEditor = view.findViewById(R.id.serialNumberEdit)
         spinnerStatus = view.findViewById(R.id.spinnerStatus)
         userWidget = view.findViewById(R.id.user)
-        ps = view.findViewById(R.id.PSEditor)
+        ps = view.findViewById(R.id.note)
         saveButton = view.findViewById(R.id.saveButton)
         oldUser = view.findViewById(R.id.oldUser)
         inventNumb = view.findViewById(R.id.invenNumb)
@@ -121,16 +133,19 @@ class CardFragment : Fragment(){
 
     }
 
+    // controller
     private fun getMax() : Int {
         val file = File(requireContext().cacheDir,"max.txt")
         return file.readText().toInt()
     }
+    // controller
     private fun updateMax(){
         FileWriter(File(requireContext().cacheDir,"max.txt")).use {
             it.write((max).toString()) //?
             it.flush()
         }
     }
+
     private fun alert() : AlertDialog{
         var value = ""
         val dialogView = LayoutInflater.from(requireContext()).inflate(R.layout.serial_camera_layout,null)
@@ -147,6 +162,7 @@ class CardFragment : Fragment(){
                 Log.d("Scanner","сканирование выполнилось $this")
             }
         }
+
         scopeScanner.decodeContinuous(callback)
         scopeScanner.decoderFactory = DefaultDecoderFactory(listOf(
             BarcodeFormat.CODE_93,
@@ -161,7 +177,9 @@ class CardFragment : Fragment(){
             BarcodeFormat.UPC_A,
             BarcodeFormat.CODABAR
         ))
+
         scopeScanner.resume()
+
         torch.setOnCheckedChangeListener{_, isChecked ->
             if(isChecked){
                 scopeScanner.setTorch(true)
@@ -169,6 +187,7 @@ class CardFragment : Fragment(){
                 scopeScanner.setTorch(false)
             }
         }
+
         return AlertDialog.Builder(requireContext())
             .setView(dialogView)
             .setCancelable(true)
@@ -211,6 +230,7 @@ class CardFragment : Fragment(){
         }
 
         saveButton.setOnClickListener(){
+            // controller
             max = getMax()
             if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU){
                 var change = 0
@@ -218,23 +238,25 @@ class CardFragment : Fragment(){
                 if(oldSnNumber != ""){
                     change = 1
                 }
+                // controller
                 saveCard = createEditedCard(
                     user = this.user!!,
                     card = this.card,
                     newSerialNumberString = serNumberEditor.text.toString(),
-                    "${getCurrentTime()}+03",
+                    date = "${getCurrentTime()}+03",
                     status = itemSelected,
                     change = change,
                     cabinet = this.user!!.cabinet.toString(), // заглушка
                     note = ps.text.toString(),
                 )
-
+                // controller
                 reSaveDataFile(saveCard!!)
                 if(nameFile != ""){
+                    // controller
                     getCacheFileToReWrite(nameFile,saveCard!!)
                 }
                 activityFragmentManager.popBackStack()
-            }
+            }//снизу бойлерплейт нужно будет убрать
             else{
                 if(ContextCompat.checkSelfPermission(activityContext,android.Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED){
                     ActivityCompat.requestPermissions(requireActivity(), arrayOf(android.Manifest.permission.WRITE_EXTERNAL_STORAGE),1)
@@ -269,6 +291,7 @@ class CardFragment : Fragment(){
             if(oldSnNumber != ""){
                 change = 1
             }
+            // controller
             val papaCard = createEditedCard(
                 user = this.user!!,
                 card = this.card,
@@ -280,6 +303,7 @@ class CardFragment : Fragment(){
                 note = ps.text.toString(),
             )
             if(papaCard.UEID == null){
+                //useToast
                 Toast.makeText(requireContext(),"Из дочернего обьекта сделать дочерний невозможно!",Toast.LENGTH_SHORT).show()
             }
             else {
@@ -299,7 +323,7 @@ class CardFragment : Fragment(){
         super.onDestroy()
         sound.release()
     }
-
+    // controller + view
     private fun getCacheFileToReWrite(fileNameFromCache : String,card : CardInventory) {
         val gsonEngine = GsonBuilder()
             .serializeNulls()
@@ -331,13 +355,15 @@ class CardFragment : Fragment(){
         }
     }
 
+    // controller
     private fun getCurrentTime(): String {
         val dateTime = LocalDateTime.now()
         val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS")
         return dateTime.format(formatter)
     }
 
-    private fun reSaveDataFile(newCard : CardInventory,fileName: String = "jso.json") {
+    // controller + view
+    private fun reSaveDataFile(newCard : CardInventory, fileName: String = "jso.json") {
         val gsonEngine = GsonBuilder()
             .serializeNulls()
             .create()
@@ -356,6 +382,8 @@ class CardFragment : Fragment(){
                 reWrite(i, newCard)
             }
         }
+
+
         val updatedJsonString = gsonEngine.toJson(work)
         try {
         requireContext().openFileOutput(fileName, Context.MODE_PRIVATE).use {
@@ -370,7 +398,8 @@ class CardFragment : Fragment(){
      }
 
     }
-    private fun reWrite(oldCard : CardInventory,newCard : CardInventory) : CardInventory {
+    //delete?
+    private fun reWrite(oldCard : CardInventory, newCard : CardInventory) : CardInventory {
         oldCard.SID = newCard.SID
         oldCard.UEDescription = newCard.UEDescription
         oldCard.ActionDateTime = newCard.ActionDateTime
@@ -387,6 +416,7 @@ class CardFragment : Fragment(){
         return oldCard
     }
 
+    //delete
     private fun saveJson(jsonStr : String , fileName : String = "${user?.user?.id}_${getCurrentTime().replace(":", "-")}.json"){
         if (Environment.getExternalStorageState() == Environment.MEDIA_MOUNTED) {
             val folder = File(activityContext.getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS), "json")
@@ -415,6 +445,7 @@ class CardFragment : Fragment(){
 
     }
 
+    //delete
     private fun createEditedCard(
         user : NewUser,
         card: CardInventory?,
@@ -448,12 +479,15 @@ class CardFragment : Fragment(){
     }
 
 
+    //to bundle
     fun setUser(user : NewUser?) {
         this.user = user
     }
+    //to bundle
     fun setCard(card : CardInventory?){
         this.card = card
     }
+
     companion object {
         fun newInstance(
             user : NewUser?,

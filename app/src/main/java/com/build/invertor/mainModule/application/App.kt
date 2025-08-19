@@ -1,7 +1,9 @@
 package com.build.invertor.mainModule.application
 
 import android.app.Application
-import com.build.invertor.mainModule.logCatLogger.LogCatSaver
+import Debug.logCatLogger.LogCatSaver
+import com.build.invertor.model.database.Dependencies
+import com.build.invertor.model.database.Repository
 import org.acra.BuildConfig
 import org.acra.config.dialog
 import org.acra.config.mailSender
@@ -10,6 +12,10 @@ import org.acra.ktx.initAcra
 
 class App : Application() {
     private lateinit var logCatSaver: LogCatSaver
+
+    private val repository : Repository = Repository.apply {
+        initialize(this@App)
+    }.get()
 
     override fun onCreate() {
         super.onCreate()
@@ -44,5 +50,7 @@ class App : Application() {
         super.onTerminate()
         logCatSaver.stopLogging()
     }
+
+    fun getRepository() = repository
 }
 

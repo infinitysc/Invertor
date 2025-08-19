@@ -13,8 +13,8 @@ import android.widget.AdapterView.OnItemSelectedListener
 import androidx.appcompat.widget.SwitchCompat
 import androidx.fragment.app.Fragment
 import com.build.Invertor.R
-import com.build.invertor.model.csv.NewUser
-import com.build.invertor.model.json.CardInventory
+import com.build.invertor.model.modelOld.json.csv.NewUser
+import com.build.invertor.model.modelOld.json.CardInventory
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
 import com.google.gson.Gson
@@ -31,6 +31,8 @@ import java.io.IOException
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
+
+//может интерфейст для обоих
 class BabyCardFragment : Fragment() {
     private lateinit var first: TextInputEditText
     private lateinit var second: TextInputEditText
@@ -41,6 +43,7 @@ class BabyCardFragment : Fragment() {
 
     private var papa: NewUser? = null
     private var papaCard: CardInventory? = null
+    // controller
     private var max : Int = 0
     private val sound: MediaPlayer by lazy {
         MediaPlayer.create(
@@ -107,12 +110,14 @@ class BabyCardFragment : Fragment() {
         }
 
         tap.setOnClickListener {
+            // controller
             max = getMax()
             val change = if(second.text.toString() != ""){
                 1
             }else {
                 0
             }
+            // controller
             val newBabyCard = CardInventory(
                 index = max+1,
                 SID =  papaCard?.SID!!,
@@ -140,7 +145,7 @@ class BabyCardFragment : Fragment() {
         super.onDestroy()
         sound.release()
     }
-
+    // controller
     private fun addToEndJsonFile(newCard : CardInventory) {
         val file = File(requireContext().filesDir,"jso.json")
         val gsonBuilder = GsonBuilder()
@@ -161,7 +166,7 @@ class BabyCardFragment : Fragment() {
             Log.e("FileError","$this")
         }
     }
-
+    //delete
     private fun getCacheFileToReWrite(fileNameFromCache : String,card : CardInventory) {
         val gsonEngine = GsonBuilder()
             .serializeNulls()
@@ -194,8 +199,8 @@ class BabyCardFragment : Fragment() {
         }
     }
 
-    //tag:Model
-    private fun childHasInJsonFile(list : List<CardInventory>,newCard: CardInventory) : Boolean{
+    // controller
+    private fun childHasInJsonFile(list : List<CardInventory>, newCard: CardInventory) : Boolean{
         for (i in list.iterator()){
             if(i.index == newCard.index){
                 return true
@@ -204,14 +209,14 @@ class BabyCardFragment : Fragment() {
         return false
     }
 
-    //tag:Model
+    // controller
     private fun getCurrentTime(): String {
         val dateTime = LocalDateTime.now()
         val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS")
         return dateTime.format(formatter)
     }
 
-    //Расслоить на функции надо
+    //Расслоить на функции _ne_ надо
     private fun alert(): AlertDialog {
         var value = ""
         val dialogView =
@@ -268,8 +273,8 @@ class BabyCardFragment : Fragment() {
             .create()
 
     }
-
-    private fun reSaveDataFile(newCard : CardInventory,fileName: String = "jso.json") {
+    //?
+    private fun reSaveDataFile(newCard : CardInventory, fileName: String = "jso.json") {
         val gsonEngine = GsonBuilder()
             .serializeNulls()
             .create()
@@ -301,8 +306,8 @@ class BabyCardFragment : Fragment() {
             Log.d("FileSave", "Файл не удалось перезаписать")
         }
     }
-
-    private fun reWrite(oldCard : CardInventory,newCard : CardInventory) : CardInventory {
+    // controller
+    private fun reWrite(oldCard : CardInventory, newCard : CardInventory) : CardInventory {
         oldCard.index = newCard.index
         oldCard.SID = newCard.SID
         oldCard.UEDescription = newCard.UEDescription
@@ -320,11 +325,11 @@ class BabyCardFragment : Fragment() {
     }
 
 
-
+//budnle
     fun setCard(card: CardInventory) {
         this.papaCard = card
     }
-
+//budnle
     fun setOldUser(papa: NewUser) {
         this.papa = papa
     }
@@ -337,11 +342,12 @@ class BabyCardFragment : Fragment() {
             return frag
         }
     }
-
+    // controller
     private fun getMax() : Int {
         val file = File(requireContext().cacheDir,"max.txt")
         return file.readText().toInt()
     }
+    // controller
     private fun updateMax(){
         FileWriter(File(requireContext().cacheDir,"max.txt")).use {
             it.write((max).toString()) //?

@@ -1,4 +1,4 @@
-package com.build.invertor.mainModule.logCatLogger
+package Debug.logCatLogger
 
 import android.content.Context
 import android.util.Log

@@ -13,8 +13,9 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.build.Invertor.R
 import com.build.invertor.mainModule.Card.CardFragment
-import com.build.invertor.model.csv.NewUser
-import com.build.invertor.model.json.CardInventory
+import com.build.invertor.mainModule.listFragment.recycler.Adapter
+import com.build.invertor.model.modelOld.json.csv.NewUser
+import com.build.invertor.model.modelOld.json.CardInventory
 import com.google.gson.GsonBuilder
 import com.google.gson.reflect.TypeToken
 import java.io.File
@@ -23,19 +24,25 @@ class ListChoiceFragment : Fragment() {
 
 
     private var flag = false
+    //?
     private var newList : List<CardInventory>? = null
+    // controller
     private val gsonEngine = GsonBuilder()
         .serializeNulls()
         .create()
 
-    private lateinit var time : TextView
+
     private lateinit var recyclerView : RecyclerView
+
     private lateinit var  textCod1C : TextView
+
     private var fileName = ""
 
     private var list : List<CardInventory>? = null
     private var user : NewUser? = null
-    private  var bundle : Bundle = Bundle()
+    private var bundle : Bundle = Bundle()
+
+    private var newListCard : ArrayList<CardInventory>? = null
     private val manager : FragmentManager? by lazy {
         activity?.supportFragmentManager
     }
@@ -52,6 +59,7 @@ class ListChoiceFragment : Fragment() {
 
         try {
             fileName = this.requireArguments().getString("json").toString()
+
         }catch (e : java.lang.IllegalStateException){
             e.printStackTrace()
             Log.d("CacheFile","не удалось получить имя файла так как бандл пуст")
@@ -73,13 +81,14 @@ class ListChoiceFragment : Fragment() {
     override fun onStart() {
         super.onStart()
 
+        //??
         if (flag) {
             newList = updateDataFromCache(fileName)
             flag = false
             val adapter = recyclerView.adapter as Adapter
             adapter.updateData(newList!!)
-            Toast.makeText(requireContext(),"Адаптер успешно обновлен",Toast.LENGTH_SHORT).show()
-            Log.d("CacheFile","${this.newList}")
+            Toast.makeText(requireContext(),"Адаптер успешно обновлен",Toast.LENGTH_LONG).show()
+            Log.d("CacheFile","newList is updated")
         }
     }
 
@@ -87,11 +96,7 @@ class ListChoiceFragment : Fragment() {
         super.onStop()
         flag = true
     }
-
-    override fun onPause() {
-        super.onPause()
-    }
-
+    // controller
     private fun updateDataFromCache(fileName : String): List<CardInventory>? {
         val file = checkFile(fileName)
         if(file != null){
@@ -111,20 +116,7 @@ class ListChoiceFragment : Fragment() {
             return null
         }
     }
-
-    private fun updateDataList(file : File) : List<CardInventory>? {
-        val type = object : TypeToken<List<CardInventory>>() {}.type
-        val rawJsonString = file.readText()
-        val jsonList= gsonEngine.fromJson<List<CardInventory>>(rawJsonString,type)
-        if(jsonList.isNotEmpty()){
-            return jsonList
-        }
-        else {
-            Log.d("CacheFile","Json массив пустой")
-            return null
-        }
-    }
-
+    // controller
     private fun checkFile(fileName: String) : File? {
         val cache = requireContext().cacheDir
         val file = File(cache,fileName)
@@ -143,9 +135,11 @@ class ListChoiceFragment : Fragment() {
         Log.d("CacheFile","Файл уничтожен")
     }
 
+    //bundle
     fun setList(list_ : List<CardInventory>) {
         this.list = list_
     }
+    //bundle
     fun setUser(user_ : NewUser){
         this.user = user_
     }

@@ -15,23 +15,24 @@ import androidx.fragment.app.FragmentManager
 import com.build.Invertor.R
 import com.build.invertor.mainModule.Card.CardFragment
 import com.build.invertor.mainModule.listFragment.ListChoiceFragment
-import com.build.invertor.model.csv.NewUser
-import com.build.invertor.model.json.CardInventory
-import com.build.invertor.model.json.JsonDownloader
+import com.build.invertor.model.modelOld.json.csv.NewUser
+import com.build.invertor.model.modelOld.json.CardInventory
+import com.build.invertor.model.modelOld.json.JsonDownloader
 import com.google.gson.GsonBuilder
 import com.google.zxing.BarcodeFormat
 import com.journeyapps.barcodescanner.BarcodeCallback
 import com.journeyapps.barcodescanner.BarcodeView
 import com.journeyapps.barcodescanner.DefaultDecoderFactory
+import kotlinx.coroutines.delay
 import java.io.File
+import java.io.FileNotFoundException
 import java.io.FileOutputStream
 import java.io.IOException
 
 
 class CameraFragment : Fragment(){
 
-    private lateinit var button : Button
-    private lateinit var contex : Context
+    private lateinit var buttonToNextFragment : Button
     private lateinit var valueText : TextView
     private lateinit var userText : TextView
     private lateinit var barcodeView : BarcodeView
@@ -63,25 +64,19 @@ class CameraFragment : Fragment(){
         .serializeNulls()
         .create()
 
-    override fun onAttach(context: Context) {
-        this.contex = context
-        super.onAttach(context)
-    }
-
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
         Log.d("camera","$this create")
-
         return inflater.inflate(R.layout.new_camera_fragment_layout,container,false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        button = view.findViewById(R.id.but)
+        buttonToNextFragment = view.findViewById(R.id.button_to_next_fragment)
         valueText = view.findViewById(R.id.value)
         userText = view.findViewById(R.id.userValue)
         barcodeView = view.findViewById(R.id.barcode_view)
@@ -97,7 +92,28 @@ class CameraFragment : Fragment(){
         super.onStart()
 
         valueText.setOnClickListener {
-            createAlertDialog()
+            val alert = AlertDialog.Builder(requireContext())
+            alert.setTitle("Редактирование текста")
+
+            val array : ArrayAdapter<String?> = ArrayAdapter(requireContext(),R.layout.spinner,listInCode)
+            val autocom = AutoCompleteTextView(requireContext())
+            autocom.setAdapter(array)
+
+            val editText = EditText(requireContext())
+            editText.setText(valueText.text)
+
+            alert.setView(autocom)
+
+            alert.setPositiveButton("OK") { dialog, which ->
+                valueText.setText(autocom.text.toString())
+                valueString = autocom.text.toString()
+                dialog.dismiss()
+            }
+            alert.setNegativeButton("Отмена") { dialog,which->
+                dialog.dismiss()
+            }
+            val dialog = alert.create()
+            dialog.show()
         }
 
         updateData()
@@ -121,7 +137,7 @@ class CameraFragment : Fragment(){
 
         }
 
-        button.setOnClickListener{
+        buttonToNextFragment.setOnClickListener{
             if (jsonDownloader != null) {
                 val card = searchDataByNumber(valueString)
 
@@ -180,14 +196,20 @@ class CameraFragment : Fragment(){
     }
 
     private fun updateData()  {
-        Log.d("FileWork","Апдейт файла json")
-        val file = requireContext().openFileInput("jso.json")
-        this.jsonDownloader = JsonDownloader(file)
+        Log.d("FileWork","update json")
+        try {
+            val file = requireContext().openFileInput("jso.json")
+            this.jsonDownloader = JsonDownloader(file)
+        }
+        catch (e : FileNotFoundException) {
+            e.printStackTrace()
+            Log.d("FileWork","File not found")
+            useToast("Ошибка: файл не был найден")
+        }
     }
 
     private fun multipleChoice(list : List<CardInventory>) {
         cacheSaver(list)
-
         val bundle : Bundle = Bundle()
         bundle.putString("json","${singleList?.user?.userName}.json")
 
@@ -205,6 +227,13 @@ class CameraFragment : Fragment(){
 
     private fun cacheSaver(list : List<CardInventory>){
         val cacheDir = requireContext().cacheDir
+
+        if(cacheContainsFile()){
+            requireContext().cacheDir.listFiles()?.forEach {
+                it.deleteRecursively()
+            }
+        }
+
         val newCacheFile = File(cacheDir,"${singleList?.user?.userName}.json")
         val jsonList = gsonEngineSerNulls.toJson(list)
 
@@ -213,11 +242,11 @@ class CameraFragment : Fragment(){
                 it.write(jsonList.toByteArray())
                 it.flush()
             }
-            Log.e("CacheFile", "Файл в кеше сохранен")
+            Log.i("CacheFile", "file saved in cache")
         }
         catch (E : IOException){
             E.printStackTrace()
-            Log.e("CacheFile","Файл не сохранен")
+            Log.e("CacheFile","file doesn't save")
         }
 
     }
@@ -237,8 +266,16 @@ class CameraFragment : Fragment(){
         }
     }
 
+    private fun cacheContainsFile() : Boolean{
+        if(requireContext().cacheDir.listFiles()!!.isEmpty()){
+            return true
+        }
+        else {
+            return false
+        }
+    }
 
-    //tag:Model
+    //tag:Controller
     private fun searchDataByNumber(nomer : String) : List<CardInventory> {
         val mutList : MutableList<CardInventory> = mutableListOf()
         val mapTemp = jsonDownloader!!.getxDoubleLink()

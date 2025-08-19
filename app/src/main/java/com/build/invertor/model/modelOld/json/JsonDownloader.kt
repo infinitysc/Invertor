@@ -1,6 +1,7 @@
-package com.build.invertor.model.json
+package com.build.invertor.model.modelOld.json
 
 import android.content.Context
+import android.os.Parcelable
 
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
@@ -10,27 +11,12 @@ import java.io.FileOutputStream
 import java.io.FileWriter
 import java.io.InputStream
 
-
-/**
- * Класс предназначенный для загрузки json файла из системы Android(пока не реализованно)
- *
- * Происходит преобразование json строки в List<CardInventory>
- * и разборка этого списка на:
- *
- * Список,
- *
- * "Связанный" список invetNumber(Инвентарный номер) -> CardInventory**
- *
- * "Связанный" список(map) в виде Pair<inventNumb,cod1C>(пара инвентарного номера и кода 1с) -> CardInventory
- *
- * **/
-class JsonDownloader(private val path : InputStream) {
+class JsonDownloader(private val path : InputStream)  {
 
     private val gsonSerNulls = GsonBuilder()
         .serializeNulls()
         .create()
     private val gson : Gson = GsonBuilder().create()
-
     private var maxUEID = 0
     private val list : List<CardInventory>
     private val linkedMap : Map<String?, CardInventory>
@@ -48,19 +34,74 @@ class JsonDownloader(private val path : InputStream) {
         xDoubleLink = exp_createDoubleLink()
     }
 
-    fun getFlagIndex() = flagIndex
+   fun getFlagIndex() = flagIndex
 
     fun getMaxUEID() = maxUEID
 
-    fun getList() : List<CardInventory> = this.list
+   fun getList() : List<CardInventory> = this.list
 
     fun getLinkedList() : Map<String?, CardInventory> = this.linkedMap
 
     fun getListCode() : List<String> = this.listCod1cInvent
 
-    fun getPairLinkedMap() : Map<Pair<String,String>, CardInventory> = this.pairLinkedMap
+     fun getPairLinkedMap() : Map<Pair<String,String>, CardInventory> = this.pairLinkedMap
 
-    fun getxDoubleLink() = this.xDoubleLink
+     fun getxDoubleLink() = this.xDoubleLink
+
+     fun updateIndexList() {
+        setIndexToCardInventory()
+        maxUEID = setLast()
+        flagIndex = true
+    }
+
+
+    fun updateListAfterIndex(context : Context) {
+        if(flagIndex){
+            val fileDir = context.filesDir
+            val file = File(fileDir,"jso.json")
+            val gson = GsonBuilder()
+                .serializeNulls()
+                .create()
+            val str = gson.toJson(this.list)
+
+            val cacheDir = context.cacheDir
+            File(cacheDir,"max.txt")
+            if(maxUEID > 0){
+                FileWriter(File(cacheDir,"max.txt")).use {
+                    it.write(maxUEID.toString())
+                    it.flush()
+                }
+            }
+
+            FileOutputStream(file).use {
+                it.write(str.toByteArray())
+                it.flush()
+            }
+        }
+    }
+    fun updateListAfterIndexController(cacheDir : File ,fileDir : File) {
+        if(flagIndex){
+
+            val file = File(fileDir,"jso.json")
+            val gson = GsonBuilder()
+                .serializeNulls()
+                .create()
+            val str = gson.toJson(this.list)
+
+            val max = File(cacheDir,"max.txt")
+            if(maxUEID > 0){
+                FileWriter(max).use {
+                    it.write(maxUEID.toString())
+                    it.flush()
+                }
+            }
+            FileOutputStream(file).use {
+                it.write(str.toByteArray())
+                it.flush()
+            }
+
+        }
+    }
 
     private fun createList() : List<CardInventory> {
         val jsonString = changeToString(path)
@@ -82,35 +123,13 @@ class JsonDownloader(private val path : InputStream) {
         }
     }
 
-    fun updateIndexList() {
+    private fun setIndexToCardInventory() : Unit {
         this.list.forEachIndexed { index, cardInventory ->
             cardInventory.index = index
         }
-        maxUEID = this.list.last().index
-        flagIndex = true
     }
 
-    fun updateListAfterIndex(context : Context) {
-        if(flagIndex) {
-            val fileDir = context.filesDir
-            val file = File(fileDir,"jso.json")
-            val str = gsonSerNulls.toJson(this.list)
-            val cacheDir = context.cacheDir
-            File(cacheDir,"max.txt")
-
-        if(maxUEID > 0){
-            FileWriter(File(cacheDir,"max.txt")).use {
-                it.write(maxUEID.toString())
-                it.flush()
-            }
-        }
-
-       FileOutputStream(file).use {
-           it.write(str.toByteArray())
-           it.flush()
-            }
-        }
-    }
+    private fun setLast() : Int = this.list.last().index
 
     private fun createLink(list : List<CardInventory>): MutableMap<String?, CardInventory> {
         val link : MutableMap<String?, CardInventory> = mutableMapOf()
@@ -142,7 +161,7 @@ class JsonDownloader(private val path : InputStream) {
         return startPairLinkerMap
     }
 
-    private fun keyContainsInMap(map : MutableMap<Pair<String,String>, MutableList<CardInventory>>,key : Pair<String,String>,value : CardInventory){
+    private fun keyContainsInMap(map : MutableMap<Pair<String,String>, MutableList<CardInventory>>, key : Pair<String,String>, value : CardInventory){
         if(key in map){
             map[key]?.add(value)
         }
@@ -161,17 +180,5 @@ class JsonDownloader(private val path : InputStream) {
         return startList
     }
 
-    fun searchMaxUEID() : Int {
-        var maxUEID = 0
-
-        for(i in list.iterator()){
-            if(i.UEID != null){
-                if(i.UEID!! > maxUEID) {
-                    maxUEID = i.UEID!!
-                }
-            }
-        }
-        return maxUEID
-    }
 
 }

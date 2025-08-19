@@ -1,4 +1,4 @@
-package com.build.invertor.mainModule.listFragment
+package com.build.invertor.mainModule.listFragment.recycler
 
 import android.view.LayoutInflater
 import android.view.View
@@ -7,8 +7,8 @@ import android.widget.TextView
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.build.Invertor.R
-import com.build.invertor.model.csv.NewUser
-import com.build.invertor.model.json.CardInventory
+import com.build.invertor.model.modelOld.json.csv.NewUser
+import com.build.invertor.model.modelOld.json.CardInventory
 
 class Adapter(
     private var list : MutableList<CardInventory>,
@@ -18,9 +18,9 @@ class Adapter(
 
     class ViewHolder(itemView : View) : RecyclerView.ViewHolder(itemView) {
         val adress = itemView.findViewById<TextView>(R.id.choiceAdress)
-        val description : TextView = itemView.findViewById<TextView>(R.id.choiceDescription)
-        val invent : TextView= itemView.findViewById<TextView>(R.id.choiceInvent)
-        val textContinut : TextView= itemView.findViewById<TextView>(R.id.cont)
+        val description : TextView = itemView.findViewById(R.id.choiceDescription)
+        val invent : TextView= itemView.findViewById(R.id.choiceInvent)
+        val textContinut : TextView= itemView.findViewById(R.id.cont)
         val time : TextView = itemView.findViewById(R.id.time)
     }
 

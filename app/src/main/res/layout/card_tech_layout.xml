@@ -23,7 +23,7 @@ android:layout_height="match_parent">
         app:layout_constraintTop_toBottomOf="@+id/user">
 
         <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/PSEditor"
+            android:id="@+id/note"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:gravity="top"

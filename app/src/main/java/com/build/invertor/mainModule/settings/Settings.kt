@@ -19,6 +19,7 @@ import androidx.core.content.ContextCompat
 import androidx.documentfile.provider.DocumentFile
 import androidx.fragment.app.Fragment
 import com.build.Invertor.R
+import com.build.invertor.model.database.converters.ConverterJson
 import java.io.*
 
 class Settings : Fragment() {
@@ -49,6 +50,7 @@ class Settings : Fragment() {
     override fun onStart() {
         super.onStart()
 
+        //Решить сегмент с разрешениями -> сделать более приятный на глаз код
         importExcelButton.setOnClickListener{
             if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.R){
                 IntentConfiguratorExcel()
@@ -155,6 +157,9 @@ class Settings : Fragment() {
                 input?.copyTo(output)
             }
         }
+
+        //ConverterJson(inputStream!!,requireContext()) // TEST 26.07.25
+
         Toast.makeText(requireContext(),"Импорт файла успешно завершен",Toast.LENGTH_SHORT).show()
         Log.d("FileUtility", "JSON file copied to internal storage: $fileName")
     }

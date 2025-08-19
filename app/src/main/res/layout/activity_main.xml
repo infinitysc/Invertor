@@ -3,14 +3,14 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context=".mainModule.SingleActivity.MainActivity">
+    android:layout_height="match_parent">
+    <!-- tools:context=".mainModule.singleActivity.MainActivity -->
 
     <ImageButton
         android:id="@+id/imageButton"
         android:layout_width="64dp"
         android:layout_height="55dp"
-        android:layout_marginTop="6dp"
+        android:layout_marginTop="150dp"
         android:layout_marginEnd="6dp"
         android:layout_weight="1"
         app:layout_constraintEnd_toEndOf="parent"
@@ -32,11 +32,11 @@
         android:layout_width="379dp"
         android:layout_height="76dp"
         android:layout_marginStart="16dp"
-        android:layout_marginTop="152dp"
+        android:layout_marginTop="25dp"
         android:gravity="center"
         android:text="@string/chooseUserAuto"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toBottomOf="@+id/imageButton" />
 
     <TextView
         android:id="@+id/departament"

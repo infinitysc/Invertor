@@ -18,7 +18,7 @@
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/Theme.Invertor"
-        tools:targetApi="31"
+        tools:targetApi="34"
         android:name = "com.build.invertor.mainModule.application.App"
         >
 
