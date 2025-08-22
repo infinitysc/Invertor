@@ -1,7 +1,6 @@
 package com.build.invertor.mainModule.Card
 
-import com.build.invertor.mainModule.AbstractController
-import com.build.invertor.model.modelOld.json.CardInventory
+import com.build.invertor.model.modelOld.json.json.CardInventory
 import com.build.invertor.model.modelOld.json.csv.NewUser
 import java.io.File
 import java.io.FileWriter

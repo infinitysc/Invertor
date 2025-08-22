@@ -1,6 +1,7 @@
 package com.build.invertor.mainModule.settings
 
 import android.app.Activity
+import android.app.Application
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -19,7 +20,8 @@ import androidx.core.content.ContextCompat
 import androidx.documentfile.provider.DocumentFile
 import androidx.fragment.app.Fragment
 import com.build.Invertor.R
-import com.build.invertor.model.database.converters.ConverterJson
+import com.build.invertor.mainModule.application.App
+import com.build.invertor.model.database.Repository
 import java.io.*
 
 class Settings : Fragment() {
@@ -28,7 +30,8 @@ class Settings : Fragment() {
     private lateinit var importButton : Button
     private lateinit var exportButton : Button
     private lateinit var importExcelButton : Button
-
+    private val dagger = (requireActivity().application as App).dagger
+    private val instanceDatabase = dagger.getDatabaseImpl()
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -49,7 +52,6 @@ class Settings : Fragment() {
 
     override fun onStart() {
         super.onStart()
-
         //Решить сегмент с разрешениями -> сделать более приятный на глаз код
         importExcelButton.setOnClickListener{
             if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.R){
@@ -70,7 +72,7 @@ class Settings : Fragment() {
 
         importButton.setOnClickListener(){
             if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.R){
-                import()
+                launchJsonFilePicker()
             }
             else{
                 if(ContextCompat.checkSelfPermission(requireContext(), android.Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED ||
@@ -80,12 +82,13 @@ class Settings : Fragment() {
                         .requestPermissions(requireActivity(), arrayOf(android.Manifest.permission.READ_EXTERNAL_STORAGE, android.Manifest.permission.WRITE_EXTERNAL_STORAGE), 1)
                 }
                 else{
-                    import()
+                    launchJsonFilePicker()
                 }
             }
         }
 
         exportButton.setOnClickListener(){
+
             if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.R){
                 if(File(requireContext().filesDir,"jso.json").exists())
                 {
@@ -280,9 +283,6 @@ class Settings : Fragment() {
         }
     }
 
-    private fun import(){
-        launchJsonFilePicker()
-    }
 
     private var selectedExcelFileUri : Uri? = null
     private fun IntentConfiguratorExcel() {

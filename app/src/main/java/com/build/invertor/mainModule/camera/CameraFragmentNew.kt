@@ -1,6 +1,7 @@
 package com.build.invertor.mainModule.camera
 
 import android.app.AlertDialog
+import android.content.Context
 import android.media.MediaPlayer
 import android.os.Bundle
 import android.util.Log
@@ -16,21 +17,19 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.widget.SwitchCompat
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.replace
 import com.build.Invertor.R
-import com.build.invertor.mainModule.Card.CardFragment
 import com.build.invertor.mainModule.Card.CardFragmentNew
+import com.build.invertor.mainModule.application.App
 import com.build.invertor.mainModule.listFragment.ListChoiceFragment
-import com.build.invertor.mainModule.start.StartFragmentNew
 import com.build.invertor.model.modelOld.json.csv.NewUser
-import com.build.invertor.model.modelOld.json.CardInventory
-import com.google.gson.GsonBuilder
+import com.build.invertor.model.modelOld.json.json.CardInventory
 import com.google.zxing.BarcodeFormat
 import com.journeyapps.barcodescanner.BarcodeCallback
 import com.journeyapps.barcodescanner.BarcodeView
 import com.journeyapps.barcodescanner.DefaultDecoderFactory
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
+import javax.inject.Inject
 
 class CameraFragmentNew : Fragment(){
 
@@ -40,6 +39,8 @@ class CameraFragmentNew : Fragment(){
     private lateinit var barcodeView : BarcodeView
     private lateinit var switch : SwitchCompat
     private lateinit var refresh : ImageView
+
+
     private lateinit var controller: CameraController
 
     private val sound : MediaPlayer by lazy { MediaPlayer.create(requireContext(), R.raw.scanner_beep) }
@@ -53,6 +54,10 @@ class CameraFragmentNew : Fragment(){
         BarcodeFormat.EAN_8,
     )
 
+    @Inject
+    fun setController(cameraController: CameraController) {
+        controller = cameraController
+    }
 
     private val callback = BarcodeCallback { result ->
         if(result != null){
@@ -89,11 +94,12 @@ class CameraFragmentNew : Fragment(){
         userText.text = user!!.user?.userName
         barcodeView.decoderFactory = DefaultDecoderFactory(formats)
         barcodeView.decodeContinuous(callback)
+
     }
 
     override fun onStart() {
         super.onStart()
-        controller = CameraController(requireContext().filesDir,requireContext().cacheDir)
+        (requireActivity().application as App).dagger.injectCameraFragment(this)
         valueText.setOnClickListener {
             val alert = AlertDialog.Builder(requireContext())
             alert.setTitle("Редактирование текста")

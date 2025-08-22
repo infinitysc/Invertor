@@ -8,11 +8,9 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import com.build.Invertor.R
 import com.build.invertor.mainModule.application.App
-import com.build.invertor.mainModule.start.StartFragment
+import com.build.invertor.mainModule.oldFragments.StartFragment
 import com.build.invertor.mainModule.start.StartFragmentNew
 import com.build.invertor.model.database.Repository
-import com.build.invertor.model.database.converters.ConverterExcel
-import com.build.invertor.model.database.converters.ConverterJson
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
@@ -28,8 +26,6 @@ class MainActivity : AppCompatActivity(){
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.hub_layout)
-
-        val viewModel = ViewModelProvider(this)[ViewModel::class]
 
         val mainFragment = StartFragmentNew()
 

@@ -8,9 +8,11 @@ import com.build.invertor.model.database.data.DAOUser
 import com.build.invertor.model.database.data.UserEntity
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import javax.inject.Inject
+import javax.inject.Singleton
 
 
-class Repository private constructor(private val context : Context) {
+class Repository @Inject constructor(private val context : Context) {
 
     private val database : AppDataBase = Room.databaseBuilder(context,AppDataBase::class.java,"AppDatabase").build()
     private val daoUser = database.getDaoUser()
@@ -58,21 +60,6 @@ class Repository private constructor(private val context : Context) {
     suspend fun updateCard(cardEntity: CardEntity) {
         withContext(Dispatchers.IO){
             daoCard.updateCard(cardEntity)
-        }
-    }
-
-    companion object{
-        private var INSTANCE : Repository? = null
-        fun initialize(context : Context) {
-
-            if(INSTANCE == null){
-                INSTANCE = Repository(context)
-            }
-
-        }
-        fun get() : Repository {
-            return INSTANCE ?: throw IllegalStateException("Repository is not initialized")
-
         }
     }
 

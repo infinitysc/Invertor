@@ -14,10 +14,9 @@ import androidx.appcompat.widget.SwitchCompat
 import androidx.fragment.app.Fragment
 import com.build.Invertor.R
 import com.build.invertor.model.modelOld.json.csv.NewUser
-import com.build.invertor.model.modelOld.json.CardInventory
+import com.build.invertor.model.modelOld.json.json.CardInventory
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
-import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import com.google.gson.reflect.TypeToken
 import com.google.zxing.BarcodeFormat
@@ -34,6 +33,8 @@ import java.time.format.DateTimeFormatter
 
 //может интерфейст для обоих
 class BabyCardFragment : Fragment() {
+
+
     private lateinit var first: TextInputEditText
     private lateinit var second: TextInputEditText
     private lateinit var thrid: TextInputEditText

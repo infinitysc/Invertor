@@ -15,7 +15,7 @@ import com.build.Invertor.R
 import com.build.invertor.mainModule.Card.CardFragment
 import com.build.invertor.mainModule.listFragment.recycler.Adapter
 import com.build.invertor.model.modelOld.json.csv.NewUser
-import com.build.invertor.model.modelOld.json.CardInventory
+import com.build.invertor.model.modelOld.json.json.CardInventory
 import com.google.gson.GsonBuilder
 import com.google.gson.reflect.TypeToken
 import java.io.File

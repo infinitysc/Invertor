@@ -7,15 +7,18 @@ import org.jetbrains.annotations.TestOnly
 import java.io.File
 import java.io.FileWriter
 import java.io.InputStream
+import javax.inject.Inject
+import javax.inject.Named
 
-class DataDownloader(
-    private val path : InputStream,
+class DataDownloader @Inject constructor(
+    @Named("Excel") private val path : InputStream,
 ) : DataExcel {
-    private val workBook : Workbook
+
+
+    private val workBook : Workbook = XSSFWorkbook(path)
     private val list : MutableList<User> = mutableListOf()
 
     init {
-        workBook = XSSFWorkbook(path)
         inExcel(workSheet = workBook.getSheetAt(0),)
     }
 

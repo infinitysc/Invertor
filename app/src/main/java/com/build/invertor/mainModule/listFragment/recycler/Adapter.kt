@@ -8,7 +8,7 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.build.Invertor.R
 import com.build.invertor.model.modelOld.json.csv.NewUser
-import com.build.invertor.model.modelOld.json.CardInventory
+import com.build.invertor.model.modelOld.json.json.CardInventory
 
 class Adapter(
     private var list : MutableList<CardInventory>,

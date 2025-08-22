@@ -1,7 +1,7 @@
 package com.build.invertor.mainModule.listFragment.recycler
 
 import androidx.recyclerview.widget.DiffUtil
-import com.build.invertor.model.modelOld.json.CardInventory
+import com.build.invertor.model.modelOld.json.json.CardInventory
 
 class Diff (
     private val oldList : List<CardInventory>,

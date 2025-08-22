@@ -1,17 +1,18 @@
-package com.build.invertor.model.modelOld.json
+package com.build.invertor.model.modelOld.json.json
 
 import android.content.Context
-import android.os.Parcelable
 
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
-import com.google.gson.reflect.TypeToken
 import java.io.File
 import java.io.FileOutputStream
 import java.io.FileWriter
 import java.io.InputStream
+import javax.inject.Inject
+import javax.inject.Named
+import kotlin.collections.iterator
 
-class JsonDownloader(private val path : InputStream)  {
+class JsonDownloader @Inject constructor( private val fileOpener: JsonFileOpener) : DataAccesInterface {
 
     private val gsonSerNulls = GsonBuilder()
         .serializeNulls()
@@ -27,28 +28,30 @@ class JsonDownloader(private val path : InputStream)  {
     private val xDoubleLink : Map<Pair<String,String>,MutableList<CardInventory>>
 
     init {
-        list = createList()
+        list = fileOpener.open()
         linkedMap = createLink(this.list)
         pairLinkedMap = createDoubleLink(this.list)
         listCod1cInvent = createListPair(this.list).toList()
         xDoubleLink = exp_createDoubleLink()
     }
 
-   fun getFlagIndex() = flagIndex
+    override fun getFlagIndex() = flagIndex
 
-    fun getMaxUEID() = maxUEID
+    override fun getMaxUEID() = maxUEID
 
-   fun getList() : List<CardInventory> = this.list
+    override fun getList() : List<CardInventory> = this.list
 
-    fun getLinkedList() : Map<String?, CardInventory> = this.linkedMap
+    override fun getLinkedList() : Map<String?, CardInventory> = this.linkedMap
 
-    fun getListCode() : List<String> = this.listCod1cInvent
 
-     fun getPairLinkedMap() : Map<Pair<String,String>, CardInventory> = this.pairLinkedMap
+    override fun getListCode() : List<String> = this.listCod1cInvent
 
-     fun getxDoubleLink() = this.xDoubleLink
+    override fun getPairLinkedMap() : Map<Pair<String,String>, CardInventory> = this.pairLinkedMap
 
-     fun updateIndexList() {
+
+    override fun getxDoubleLink() = this.xDoubleLink
+
+    override fun updateIndexList() {
         setIndexToCardInventory()
         maxUEID = setLast()
         flagIndex = true
@@ -103,11 +106,11 @@ class JsonDownloader(private val path : InputStream)  {
         }
     }
 
-    private fun createList() : List<CardInventory> {
+    /*private fun createList() : List<CardInventory> {
         val jsonString = changeToString(path)
         val typeOfList = object : TypeToken<List<CardInventory>>() {}.type
         return gson.fromJson(jsonString,typeOfList)
-    }
+    }*/
 
     private fun changeToString(input : InputStream) : String {
         val size = input.available()

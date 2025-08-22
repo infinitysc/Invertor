@@ -5,19 +5,18 @@ import android.util.Log
 import com.build.invertor.mainModule.AbstractController
 import com.build.invertor.model.modelOld.json.csv.DataDownloader
 import com.build.invertor.model.modelOld.json.csv.User
-import com.build.invertor.model.database.AppDataBase
-import com.build.invertor.model.database.Repository
-import com.build.invertor.model.modelOld.json.JsonDownloader
-import kotlinx.coroutines.newSingleThreadContext
+import com.build.invertor.model.modelOld.json.json.JsonDownloader
 import java.io.BufferedReader
 import java.io.File
 import java.io.IOException
 import java.io.InputStream
 import java.io.InputStreamReader
-import java.util.concurrent.Executor
+import javax.inject.Inject
+import javax.inject.Named
 
-class StartFragmentController constructor(private val fileDir : File,private val cacheDir : File) : AbstractController(fileDir,cacheDir) {
-
+class StartFragmentController @Inject constructor(
+    private val context : Context
+) : AbstractController(context) {
 
     private val dataOld : DataDownloader? = this.getDataFile()
     private val jsonOld : JsonDownloader? = this.getJsonFile()

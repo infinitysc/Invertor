@@ -1,13 +1,15 @@
-package com.build.invertor.model.modelOld.json
+package com.build.invertor.model.modelOld.json.json
 
 import com.build.invertor.model.database.card.CardEntity
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import java.io.InputStream
+import javax.inject.Inject
+import javax.inject.Named
 
-class JsonFileOpener(path : InputStream,private val gson: Gson) {
 
-    private val path = path
+class JsonFileOpener @Inject constructor(@Named("Json")private val path : InputStream, private val gson: Gson) {
+
 
     fun open () : List<CardInventory> {
         val jsonString = changeToString(path)
@@ -28,6 +30,7 @@ class JsonFileOpener(path : InputStream,private val gson: Gson) {
             return "empty"
         }
     }
+
 
 
     fun openForDatabase() : List<CardEntity> {

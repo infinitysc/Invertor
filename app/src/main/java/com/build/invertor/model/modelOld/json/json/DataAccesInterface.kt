@@ -1,4 +1,4 @@
-package com.build.invertor.model.modelOld.json
+package com.build.invertor.model.modelOld.json.json
 
 interface DataAccesInterface {
 

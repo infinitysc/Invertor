@@ -21,17 +21,18 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import com.build.Invertor.R
+import com.build.invertor.mainModule.application.App
 
 import com.build.invertor.mainModule.camera.CameraFragmentNew
 import com.build.invertor.mainModule.settings.Settings
 import com.build.invertor.model.modelOld.json.csv.NewUser
-import com.build.invertor.model.modelOld.json.CardInventory
 import com.google.android.material.textfield.TextInputEditText
 import java.io.BufferedReader
 import java.io.IOException
 import java.io.InputStream
 import java.io.InputStreamReader
 import java.util.ArrayList
+import javax.inject.Inject
 
 class StartFragmentNew : Fragment() {
 
@@ -41,7 +42,9 @@ class StartFragmentNew : Fragment() {
     private lateinit var cabinetEditor : TextInputEditText
     private lateinit var departament : TextView
     private lateinit var adressSpinner : Spinner
-    private lateinit var controller : StartFragmentController
+    //dagger
+    @Inject
+    lateinit var controller : StartFragmentController
 
 
 
@@ -72,7 +75,7 @@ class StartFragmentNew : Fragment() {
         cabinetEditor = view.findViewById(R.id.cabinetEdit)
         adressSpinner = view.findViewById(R.id.adressSpinner)
 
-        controller = StartFragmentController(requireContext().filesDir,requireContext().cacheDir)
+        (requireActivity().application as App).dagger.injectStartFragment(this)
     }
 
     private fun txtToList(input : InputStream) : List<String> {
@@ -161,16 +164,20 @@ class StartFragmentNew : Fragment() {
     }
 
     private fun checkPermission(reqCode : Int) : Boolean{
+
         if(ContextCompat.checkSelfPermission(requireContext(),android.Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED){
             ActivityCompat.requestPermissions(requireActivity(), arrayOf(android.Manifest.permission.CAMERA),reqCode)
             return true
         }
         return false
     }
+
     private fun launchCameraFragmentOldVersion(reqCode: Int) {
+
         if(ContextCompat.checkSelfPermission(requireContext(),android.Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED){
             ActivityCompat.requestPermissions(requireActivity(), arrayOf(android.Manifest.permission.CAMERA),reqCode)
         }
+
         else {
             if(controller.checkJsonIsNull()){
                 if(spinAdr != "Выберите адрес")

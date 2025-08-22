@@ -1,13 +1,20 @@
 package com.build.invertor.mainModule
 
+import android.content.Context
 import com.build.invertor.model.modelOld.json.csv.DataDownloader
-import com.build.invertor.model.modelOld.json.JsonDownloader
+import com.build.invertor.model.modelOld.json.json.JsonDownloader
+import com.build.invertor.model.modelOld.json.json.JsonFileOpener
+import com.google.gson.GsonBuilder
 import java.io.File
 
-abstract class AbstractController(private val fileDir : File,private val cacheDir : File) {
+abstract class AbstractController(context : Context) {
 
     private val jsonFile : JsonDownloader?
     private val dataFile : DataDownloader?
+
+    private val fileDir = context.filesDir
+    private val cacheDir = context.cacheDir
+
 
     init {
         dataFile = searchDataOld()
@@ -36,7 +43,7 @@ abstract class AbstractController(private val fileDir : File,private val cacheDi
 
         try {
             val file = File(fileDir,fileName)
-            return JsonDownloader(file.inputStream()).apply {
+            return JsonDownloader(JsonFileOpener(file.inputStream(), gson = GsonBuilder().create())).apply {
                 this.updateIndexList()
                 this.updateListAfterIndexController(cacheDir,fileDir)
             }

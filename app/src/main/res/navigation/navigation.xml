@@ -16,7 +16,7 @@
     </fragment>
     <fragment
         android:id="@+id/startFragment"
-        android:name="com.build.invertor.mainModule.start.StartFragment"
+        android:name="com.build.invertor.mainModule.oldFragments.StartFragment"
         android:label="StartFragment" >
         <action
             android:id="@+id/action_startFragment_to_settings"
@@ -60,7 +60,7 @@
     </fragment>
     <fragment
         android:id="@+id/cameraFragment"
-        android:name="com.build.invertor.mainModule.camera.CameraFragment"
+        android:name="com.build.invertor.mainModule.oldFragments.CameraFragment"
         android:label="CameraFragment" >
         <action
             android:id="@+id/action_cameraFragment_to_listChoiceFragment"

@@ -1,26 +1,33 @@
 package com.build.invertor.mainModule.camera
 
+import android.content.Context
 import android.util.Log
-import android.view.View
-import android.widget.Button
-import android.widget.TextView
-import com.build.Invertor.R
 import com.build.invertor.mainModule.AbstractController
-import com.build.invertor.model.modelOld.json.CardInventory
-import com.build.invertor.model.modelOld.json.JsonDownloader
+import com.build.invertor.model.modelOld.json.json.CardInventory
+import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
+import javax.inject.Inject
+import javax.inject.Named
 
-class CameraController(private val fileDir : File, private val cacheDir : File) : AbstractController(fileDir,cacheDir) {
+class CameraController @Inject constructor(private val context : Context) : AbstractController(context) {
 
     private val data = this.getDataFile()
     private val json = this.getJsonFile()
+    private val cacheDir : File = context.cacheDir
 
-    private val gson = GsonBuilder()
-        .serializeNulls()
-        .create()
+
+    private lateinit var gson : Gson
+
+    @Inject
+    @Named("GsonSerNulls")
+    fun setGson(gson : Gson) {
+        this.gson = gson
+    }
+
+
     fun searchDataByNumber(id : String) : List<CardInventory> {
         val tempList = mutableListOf<CardInventory>()
 
@@ -38,7 +45,7 @@ class CameraController(private val fileDir : File, private val cacheDir : File) 
         if(cacheContainsFiles()){
             cacheDeleteFiles()
         }
-        val newCacheFile = File(cacheDir,"${userName}.json")
+        val newCacheFile = File(context.cacheDir,"${userName}.json")
         val jsonList = gson.toJson(card)
 
         try {
