@@ -23,15 +23,31 @@ import com.build.Invertor.R
 import com.build.invertor.mainModule.application.App
 import com.build.invertor.model.database.Repository
 import java.io.*
+import javax.inject.Inject
+import androidx.core.content.edit
+import com.build.invertor.model.database.AppDataBase
 
 class Settings : Fragment() {
-
 
     private lateinit var importButton : Button
     private lateinit var exportButton : Button
     private lateinit var importExcelButton : Button
-    private val dagger = (requireActivity().application as App).dagger
-    private val instanceDatabase = dagger.getDatabaseImpl()
+    private lateinit var instanceDatabase : Repository
+
+    private var selectedExcelFileUri : Uri? = null
+    private var saveFileName: String? = null
+    private var selectedJsonFileUri: Uri? = null
+
+    @Inject
+    fun create(rep : Repository) {
+        instanceDatabase = rep
+    }
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        (requireActivity().application as App).dagger.injectSettings(this)
+    }
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -46,191 +62,109 @@ class Settings : Fragment() {
         importButton = view.findViewById(R.id.importButton)
         exportButton = view.findViewById(R.id.exportButton)
         importExcelButton = view.findViewById(R.id.excelButton)
-
-
     }
 
     override fun onStart() {
         super.onStart()
-        //Решить сегмент с разрешениями -> сделать более приятный на глаз код
-        importExcelButton.setOnClickListener{
-            if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.R){
-                IntentConfiguratorExcel()
-            }
-            else {
-                if(ContextCompat.checkSelfPermission(requireContext(), android.Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED ||
-                    ContextCompat.checkSelfPermission(requireContext(), android.Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
 
-                    ActivityCompat
-                        .requestPermissions(requireActivity(), arrayOf(android.Manifest.permission.READ_EXTERNAL_STORAGE, android.Manifest.permission.WRITE_EXTERNAL_STORAGE), 1)
-                }
-                else{
-                    IntentConfiguratorExcel()
-                }
+        importExcelButton.setOnClickListener{
+            provideComplete{
+                intentConfiguratorExcel()
             }
         }
 
         importButton.setOnClickListener(){
-            if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.R){
+            provideComplete {
                 launchJsonFilePicker()
-            }
-            else{
-                if(ContextCompat.checkSelfPermission(requireContext(), android.Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED ||
-                    ContextCompat.checkSelfPermission(requireContext(), android.Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-
-                    ActivityCompat
-                        .requestPermissions(requireActivity(), arrayOf(android.Manifest.permission.READ_EXTERNAL_STORAGE, android.Manifest.permission.WRITE_EXTERNAL_STORAGE), 1)
-                }
-                else{
-                    launchJsonFilePicker()
-                }
             }
         }
 
         exportButton.setOnClickListener(){
-
-            if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.R){
-                if(File(requireContext().filesDir,"jso.json").exists())
-                {
+            provideComplete {
+                if(File(requireContext().filesDir,"jso.json").exists()){
                     toExportJsonFileFromInternalStorage("jso.json")
-                }
-                else{
-                    Toast.makeText(requireContext(),"Вы не загрузили файл",Toast.LENGTH_SHORT).show()
-                }
-
-            }
-            else {
-                //BuildVersion
-                if (ContextCompat.checkSelfPermission(
-                        requireContext(),
-                        android.Manifest.permission.READ_EXTERNAL_STORAGE
-                    ) != PackageManager.PERMISSION_GRANTED
-                ) {
-                    ActivityCompat.requestPermissions(
-                        requireActivity(),
-                        arrayOf(android.Manifest.permission.READ_EXTERNAL_STORAGE),
-                        1
-                    )
-                } else {
-                    if(File(requireContext().filesDir,"jso.json").exists())
-                    {
-                        toExportJsonFileFromInternalStorage("jso.json")
-                    }
-                    else{
-                        Toast.makeText(requireContext(),"Вы не загрузили файл",Toast.LENGTH_SHORT).show()
-                    }
+                }else {
+                    Toast.makeText(requireContext(),"Вы не загрузили файл", Toast.LENGTH_SHORT).show()
                 }
             }
-
         }
-
-
     }
 
+    private fun checkVersion() : Boolean{
+        return if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.R){
+            true
+        }
+        else false
+    }
 
+    private fun requestPermission() : Boolean {
+        return if (ContextCompat.checkSelfPermission(
+                requireContext(),
+                android.Manifest.permission.READ_EXTERNAL_STORAGE
+            ) != PackageManager.PERMISSION_GRANTED ||
+            ContextCompat.checkSelfPermission(
+                requireContext(),
+                android.Manifest.permission.WRITE_EXTERNAL_STORAGE
+            ) != PackageManager.PERMISSION_GRANTED
+        ) {
+            ActivityCompat
+                .requestPermissions(requireActivity(), arrayOf(android.Manifest.permission.READ_EXTERNAL_STORAGE, android.Manifest.permission.WRITE_EXTERNAL_STORAGE), 1)
+            false
+        }
+        else true
+    }
 
-    private var selectedJsonFileUri: Uri? = null
-    private val jsonFilePickerLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+    private fun provideComplete(func : () -> Unit ) : Unit {
+        when {
+            checkVersion() -> func.invoke()
+            requestPermission() -> func.invoke()
+            else -> Toast.makeText(requireContext(),"Permission is not granted",Toast.LENGTH_SHORT)
+                .show()
+                .apply {
+                    Log.i("Permission","Permission is not granted")
+                }
+        }
+    }
+
+    private val register = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+
         if (result.resultCode == Activity.RESULT_OK) {
+
             selectedJsonFileUri = result.data?.data
             selectedJsonFileUri?.let { uri ->
-                val takeFlags = Intent.FLAG_GRANT_READ_URI_PERMISSION
-                requireContext().contentResolver.takePersistableUriPermission(uri, takeFlags)
                 copyJsonFileToInternalStorage(uri)
             }
         } else {
+
             Log.e("FileUtility", "Some Error Occurred: $result")
         }
     }
 
     private fun launchJsonFilePicker() {
+
         val intent = Intent(Intent.ACTION_OPEN_DOCUMENT).apply {
             addCategory(Intent.CATEGORY_OPENABLE)
             type = "application/json" // Тип файла, который будем выбирать
         }
-        jsonFilePickerLauncher.launch(intent)
-    }
-    private fun copyJsonFileToInternalStorage(uri : Uri){
-        val fileName = "jso.json"
-        val inputStream = requireContext().contentResolver.openInputStream(uri)
-        val outputStream = requireContext().openFileOutput(fileName,Context.MODE_PRIVATE)
 
-        inputStream.use { input ->
-            outputStream.use { output ->
-                input?.copyTo(output)
+        register.launch(intent)
+    }
+
+    private fun copyJsonFileToInternalStorage(uri : Uri){
+
+        requireContext().contentResolver.openInputStream(uri)
+            .use { input ->
+                requireContext().openFileOutput("jso.json",Context.MODE_PRIVATE).use { output->
+                    input?.copyTo(output)
+                }
+                input?.close()
             }
-        }
 
         //ConverterJson(inputStream!!,requireContext()) // TEST 26.07.25
 
         Toast.makeText(requireContext(),"Импорт файла успешно завершен",Toast.LENGTH_SHORT).show()
-        Log.d("FileUtility", "JSON file copied to internal storage: $fileName")
+        Log.d("FileUtility", "JSON file copied to internal storage ")
     }
-    private fun export(){
-        launchBaseDirectoryPicker()
-    }
-
-    private var baseDocumentTreeUri: Uri? = null
-
-    private val launcher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-        if (result.resultCode == Activity.RESULT_OK) {
-            baseDocumentTreeUri = result.data?.data
-            baseDocumentTreeUri?.let { uri ->
-                val takeFlags = Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION
-                requireContext().contentResolver.takePersistableUriPermission(uri, takeFlags)
-
-                val preferences = requireContext().getSharedPreferences("com.build.Invertor", Context.MODE_PRIVATE)
-                preferences.edit().putString("filestorageuri", uri.toString()).apply()
-                exportJsonFileFromInternalStorage("jso.json")
-            }
-        } else {
-            Log.e("FileUtility", "Some Error Occurred: $result")
-        }
-    }
-
-    private fun launchBaseDirectoryPicker() {
-        val intent = Intent(Intent.ACTION_OPEN_DOCUMENT_TREE)
-        launcher.launch(intent)
-    }
-
-    private fun getBaseDocumentTreeUri(): Uri? {
-        val preferences = requireContext().getSharedPreferences("com.build.Invertor", Context.MODE_PRIVATE)
-        val uriString = preferences.getString("filestorageuri", null)
-        return uriString?.let { Uri.parse(it) }
-    }
-
-    private fun exportJsonFileFromInternalStorage(fileName: String) {
-        try {
-            val uri = getBaseDocumentTreeUri()
-            if (uri != null) {
-                val directory = DocumentFile.fromTreeUri(requireContext(), uri)
-
-                val exportFile = directory?.createFile("application/json", fileName)
-
-
-                val inputStream = requireContext().openFileInput(fileName)
-                val outputStream = requireContext().contentResolver.openOutputStream(exportFile!!.uri)
-
-
-                if (outputStream != null) {
-                    inputStream.use { input ->
-                        outputStream.use { output ->
-                            input.copyTo(output)
-                        }
-                    }
-                    Toast.makeText(requireContext(),"Экспорт файла успешно завершен",Toast.LENGTH_SHORT).show()
-                    Log.d("FileUtility", "Файл успешно экспортирован: ${exportFile.uri}")
-                } else {
-                    Log.e("FileUtility", "Не удалось открыть OutputStream для Uri: ${exportFile.uri}")
-                }
-            } else {
-                Log.e("FileUtility", "URI директории не найден!")
-            }
-        } catch (e: IOException) {
-            e.printStackTrace()
-        }
-    }
-    private var saveFileName: String? = null
 
     private val saveLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
         if (result.resultCode == Activity.RESULT_OK) {
@@ -283,29 +217,36 @@ class Settings : Fragment() {
         }
     }
 
+    private fun intentConfiguratorExcel() {
 
-    private var selectedExcelFileUri : Uri? = null
-    private fun IntentConfiguratorExcel() {
         val intent = Intent(Intent.ACTION_OPEN_DOCUMENT).apply {
             type = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
             addCategory(Intent.CATEGORY_OPENABLE)
         }
+
         launcherExcel.launch(intent)
     }
+
     private val launcherExcel = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {result ->
+
         if(result.resultCode == Activity.RESULT_OK){
             selectedExcelFileUri = result.data?.data!!
+
             selectedExcelFileUri.let {uri ->
                 val takeFlags = Intent.FLAG_GRANT_READ_URI_PERMISSION
                 requireContext().contentResolver.takePersistableUriPermission(uri!!, takeFlags)
+
                 chooseExcel(uri)
             }
+
         }
         else {
             Log.d("FileWork","Excel файл не удалось найти $this")
         }
     }
+
     private fun chooseExcel(uri : Uri) {
+
         val fileName = "data.xlsx"
         val inputStream = requireContext().contentResolver.openInputStream(uri)
         val outputStream = requireContext().openFileOutput(fileName,Context.MODE_PRIVATE)
@@ -315,6 +256,7 @@ class Settings : Fragment() {
                 input?.copyTo(output)
             }
         }
+
         Toast.makeText(requireContext(),"Импорт файла успешно завершен",Toast.LENGTH_SHORT).show()
         Log.d("FileWork", "Excel файл скопирован во внутреннее хранилище $fileName")
 

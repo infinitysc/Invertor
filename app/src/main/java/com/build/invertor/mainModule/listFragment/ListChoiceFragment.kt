@@ -13,12 +13,14 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.build.Invertor.R
 import com.build.invertor.mainModule.Card.CardFragment
+import com.build.invertor.mainModule.application.App
 import com.build.invertor.mainModule.listFragment.recycler.Adapter
 import com.build.invertor.model.modelOld.json.csv.NewUser
 import com.build.invertor.model.modelOld.json.json.CardInventory
 import com.google.gson.GsonBuilder
 import com.google.gson.reflect.TypeToken
 import java.io.File
+import javax.inject.Inject
 
 class ListChoiceFragment : Fragment() {
 
@@ -31,6 +33,12 @@ class ListChoiceFragment : Fragment() {
         .serializeNulls()
         .create()
 
+    private lateinit var controller: ListFragmentController
+    private val dagger = (requireActivity().application as App).dagger
+    @Inject
+    fun injectController(listFragmentController: ListFragmentController) {
+        controller = listFragmentController
+    }
 
     private lateinit var recyclerView : RecyclerView
 
@@ -56,6 +64,8 @@ class ListChoiceFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        dagger.injectListFragment(this)
 
         try {
             fileName = this.requireArguments().getString("json").toString()

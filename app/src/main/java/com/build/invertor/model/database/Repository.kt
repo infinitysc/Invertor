@@ -11,7 +11,7 @@ import kotlinx.coroutines.withContext
 import javax.inject.Inject
 import javax.inject.Singleton
 
-
+@Singleton
 class Repository @Inject constructor(private val context : Context) {
 
     private val database : AppDataBase = Room.databaseBuilder(context,AppDataBase::class.java,"AppDatabase").build()
