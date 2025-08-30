@@ -5,7 +5,11 @@ import android.content.Context
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.util.Log
+import android.view.ActionMode
+import android.view.GestureDetector
 import android.view.LayoutInflater
+import android.view.MenuItem
+import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
@@ -20,6 +24,7 @@ import android.widget.Toast
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import com.build.Invertor.R
 import com.build.invertor.mainModule.application.App
 
@@ -27,6 +32,7 @@ import com.build.invertor.mainModule.camera.CameraFragmentNew
 import com.build.invertor.mainModule.settings.Settings
 import com.build.invertor.model.modelOld.json.csv.NewUser
 import com.google.android.material.textfield.TextInputEditText
+import kotlinx.coroutines.launch
 import java.io.BufferedReader
 import java.io.IOException
 import java.io.InputStream
@@ -92,6 +98,7 @@ class StartFragmentNew : Fragment() {
     override fun onStart() {
         super.onStart()
 
+
         adressSpinner.adapter = ArrayAdapter(requireContext(),R.layout.spinner,listAdress)
 
 
@@ -149,6 +156,7 @@ class StartFragmentNew : Fragment() {
         button.setOnClickListener(){
             launchCameraFragmentOldVersion(200)
         }
+
         imageButtton.setOnClickListener{
             Log.d("FragmentReplace","Cast to SettingsFragment")
             requireActivity().supportFragmentManager.beginTransaction()

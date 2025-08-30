@@ -4,7 +4,7 @@ import android.os.Parcel
 import android.os.Parcelable
 
 
-data class CardInventory(
+data class CardInventory constructor(
     var index : Int ,
     var SID : Int ,
     var UEID : Int? ,

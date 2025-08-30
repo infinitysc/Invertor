@@ -5,7 +5,7 @@
 
     <!--StartFragment-->
     <string name = "goToScan">Перейти к сканированию</string>
-    <string name = "scan">Scan</string>
+    <string name = "scan">Перейти к сканированию</string>
     <string name ="writeFIO">Ввод ФИО</string>
     <string name = "departament">Отдел:</string>
 

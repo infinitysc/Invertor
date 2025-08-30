@@ -19,7 +19,7 @@ class JsonDownloader @Inject constructor( private val fileOpener: JsonFileOpener
         .create()
     private val gson : Gson = GsonBuilder().create()
     private var maxUEID = 0
-    private val list : List<CardInventory>
+    private val list : List<CardInventory> = fileOpener.open()
     private val linkedMap : Map<String?, CardInventory>
     private val pairLinkedMap : Map<Pair<String,String>, CardInventory>
     private val listCod1cInvent : List<String>
@@ -28,7 +28,6 @@ class JsonDownloader @Inject constructor( private val fileOpener: JsonFileOpener
     private val xDoubleLink : Map<Pair<String,String>,MutableList<CardInventory>>
 
     init {
-        list = fileOpener.open()
         linkedMap = createLink(this.list)
         pairLinkedMap = createDoubleLink(this.list)
         listCod1cInvent = createListPair(this.list).toList()

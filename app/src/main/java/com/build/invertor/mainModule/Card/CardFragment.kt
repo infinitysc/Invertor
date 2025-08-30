@@ -18,6 +18,7 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
+import androidx.lifecycle.lifecycleScope
 import com.build.Invertor.R
 import com.build.invertor.model.modelOld.json.csv.NewUser
 import com.build.invertor.model.modelOld.json.json.CardInventory
@@ -29,6 +30,7 @@ import com.google.zxing.BarcodeFormat
 import com.journeyapps.barcodescanner.BarcodeCallback
 import com.journeyapps.barcodescanner.BarcodeView
 import com.journeyapps.barcodescanner.DefaultDecoderFactory
+import kotlinx.coroutines.launch
 import java.io.File
 import java.io.FileOutputStream
 import java.io.FileWriter
@@ -231,32 +233,36 @@ class CardFragment : Fragment(){
 
         saveButton.setOnClickListener(){
             // controller
-            max = getMax()
-            if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU){
-                var change = 0
-                oldSnNumber = serNumberEditor.text.toString()
-                if(oldSnNumber != ""){
-                    change = 1
+                lifecycleScope.launch {
+                    max = getMax()
                 }
-                // controller
-                saveCard = createEditedCard(
-                    user = this.user!!,
-                    card = this.card,
-                    newSerialNumberString = serNumberEditor.text.toString(),
-                    date = "${getCurrentTime()}+03",
-                    status = itemSelected,
-                    change = change,
-                    cabinet = this.user!!.cabinet.toString(), // заглушка
-                    note = ps.text.toString(),
-                )
-                // controller
-                reSaveDataFile(saveCard!!)
-                if(nameFile != ""){
-                    // controller
-                    getCacheFileToReWrite(nameFile,saveCard!!)
-                }
-                activityFragmentManager.popBackStack()
-            }//снизу бойлерплейт нужно будет убрать
+                if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU){
+                    lifecycleScope.launch {
+                        var change = 0
+                        oldSnNumber = serNumberEditor.text.toString()
+                        if(oldSnNumber != ""){
+                            change = 1
+                        }
+                        // controller
+                        saveCard = createEditedCard(
+                            user = this@CardFragment.user!!,
+                            card = this@CardFragment.card,
+                            newSerialNumberString = serNumberEditor.text.toString(),
+                            date = "${getCurrentTime()}+03",
+                            status = itemSelected,
+                            change = change,
+                            cabinet = this@CardFragment.user!!.cabinet.toString(), // заглушка
+                            note = ps.text.toString(),
+                        )
+                        // controller
+                        reSaveDataFile(saveCard!!)
+                        if(nameFile != ""){
+                            // controller
+                            getCacheFileToReWrite(nameFile,saveCard!!)
+                        }
+                    }
+                    activityFragmentManager.popBackStack()
+            }
             else{
                 if(ContextCompat.checkSelfPermission(activityContext,android.Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED){
                     ActivityCompat.requestPermissions(requireActivity(), arrayOf(android.Manifest.permission.WRITE_EXTERNAL_STORAGE),1)

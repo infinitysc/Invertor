@@ -63,7 +63,6 @@ class BabyCardFragment : Fragment() {
         "Списание",
         "Утилизация"
     )
-
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -146,6 +145,7 @@ class BabyCardFragment : Fragment() {
         super.onDestroy()
         sound.release()
     }
+
     // controller
     private fun addToEndJsonFile(newCard : CardInventory) {
         val file = File(requireContext().filesDir,"jso.json")
@@ -167,48 +167,6 @@ class BabyCardFragment : Fragment() {
             Log.e("FileError","$this")
         }
     }
-    //delete
-    private fun getCacheFileToReWrite(fileNameFromCache : String,card : CardInventory) {
-        val gsonEngine = GsonBuilder()
-            .serializeNulls()
-            .create()
-        val fileCacheDir = requireContext().cacheDir
-        val file = File(fileCacheDir,fileNameFromCache)
-
-        if(file.exists()){
-            val type = object : TypeToken<List<CardInventory>>() {}.type
-            val listData = gsonEngine.fromJson<List<CardInventory>>(file.readText(),type)
-
-            for(i in listData.iterator()){
-                if(i.index == card.index){
-                    reWrite(i,card)
-                }
-            }
-
-            try{
-                FileOutputStream(file).use {
-                    it.write(gsonEngine.toJson(listData).toByteArray())
-                    it.flush()
-                }
-            }catch(error : IOException){
-                error.printStackTrace()
-                Log.d("CacheFile","не удалось перезаписать кеш файл $fileNameFromCache")
-            }
-        }
-        else{
-            Log.d("CacheFile","Файл не существует$this")
-        }
-    }
-
-    // controller
-    private fun childHasInJsonFile(list : List<CardInventory>, newCard: CardInventory) : Boolean{
-        for (i in list.iterator()){
-            if(i.index == newCard.index){
-                return true
-            }
-        }
-        return false
-    }
 
     // controller
     private fun getCurrentTime(): String {
@@ -217,7 +175,6 @@ class BabyCardFragment : Fragment() {
         return dateTime.format(formatter)
     }
 
-    //Расслоить на функции _ne_ надо
     private fun alert(): AlertDialog {
         var value = ""
         val dialogView =
@@ -275,6 +232,7 @@ class BabyCardFragment : Fragment() {
 
     }
     //?
+
     private fun reSaveDataFile(newCard : CardInventory, fileName: String = "jso.json") {
         val gsonEngine = GsonBuilder()
             .serializeNulls()
@@ -307,6 +265,7 @@ class BabyCardFragment : Fragment() {
             Log.d("FileSave", "Файл не удалось перезаписать")
         }
     }
+
     // controller
     private fun reWrite(oldCard : CardInventory, newCard : CardInventory) : CardInventory {
         oldCard.index = newCard.index
@@ -343,11 +302,13 @@ class BabyCardFragment : Fragment() {
             return frag
         }
     }
+
     // controller
     private fun getMax() : Int {
         val file = File(requireContext().cacheDir,"max.txt")
         return file.readText().toInt()
     }
+
     // controller
     private fun updateMax(){
         FileWriter(File(requireContext().cacheDir,"max.txt")).use {

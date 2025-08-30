@@ -2,6 +2,7 @@ package com.build.invertor.di
 
 import android.app.Application
 import android.content.Context
+import com.build.invertor.mainModule.Card.CardFragmentNew
 import com.build.invertor.mainModule.camera.CameraFragmentNew
 import com.build.invertor.mainModule.listFragment.ListChoiceFragment
 import com.build.invertor.mainModule.listFragment.ListFragmentController
@@ -26,6 +27,7 @@ interface AppComponent {
     fun injectCameraFragment(cameraFragmentNew: CameraFragmentNew)
     fun injectSettings(settings: Settings)
     fun injectListFragment(listChoiceFragment: ListChoiceFragment)
+    fun injectCardFragment(cardFragmentNew: CardFragmentNew)
     fun getDatabaseImpl() : Repository
 
     @Component.Factory

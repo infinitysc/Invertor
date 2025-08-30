@@ -13,11 +13,11 @@ android:layout_height="match_parent">
 
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/PS"
-        android:layout_width="382dp"
+        android:layout_width="match_parent"
         android:layout_height="226dp"
         android:layout_marginStart="16dp"
         android:layout_marginTop="4dp"
-        android:layout_marginEnd="15dp"
+        android:layout_marginEnd="16dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/user">
@@ -30,33 +30,39 @@ android:layout_height="match_parent">
             android:hint="@string/ps" />
     </com.google.android.material.textfield.TextInputLayout>
 
-<TextView
-    android:id="@+id/adress"
-    android:layout_width="380dp"
-    android:layout_height="52dp"
-    android:layout_marginStart="16dp"
-    android:layout_marginTop="16dp"
-    android:text="@string/adress"
-    app:layout_constraintStart_toStartOf="parent"
-    app:layout_constraintTop_toTopOf="parent" />
+    <TextView
+        android:id="@+id/adress"
+        android:layout_width="match_parent"
+        android:layout_height="52dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="16dp"
+        android:text="@string/adress"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
-<TextView
-    android:id="@+id/description"
-    android:layout_width="380dp"
-    android:layout_height="82dp"
-    android:layout_marginStart="16dp"
-    android:layout_marginTop="4dp"
-    android:text="@string/description"
-    app:layout_constraintStart_toStartOf="parent"
-    app:layout_constraintTop_toBottomOf="@+id/adress" />
+    <TextView
+        android:id="@+id/description"
+        android:layout_width="match_parent"
+        android:layout_height="82dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="4dp"
+        android:layout_marginEnd="16dp"
+        android:text="@string/description"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/adress" />
 
     <TextView
         android:id="@+id/user"
-        android:layout_width="380dp"
+        android:layout_width="match_parent"
         android:layout_height="50dp"
         android:layout_marginStart="16dp"
         android:layout_marginTop="4dp"
+        android:layout_marginEnd="16dp"
         android:text="@string/user"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/oldUser" />
 
@@ -90,46 +96,51 @@ android:layout_height="match_parent">
         android:hint="@string/serialNumberEdit" />
 </com.google.android.material.textfield.TextInputLayout>
 
-<Spinner
-    android:id="@+id/spinnerStatus"
-    android:layout_width="325dp"
-    android:layout_height="51dp"
-    android:layout_marginTop="12dp"
-    android:layout_marginEnd="12dp"
-    android:contentDescription="@string/cabinet"
-    app:layout_constraintEnd_toEndOf="parent"
-    app:layout_constraintStart_toEndOf="@+id/status"
-    app:layout_constraintTop_toBottomOf="@+id/serialNimberEditLayout" />
+    <Spinner
+        android:id="@+id/spinnerStatus"
+        android:layout_width="325dp"
+        android:layout_height="51dp"
+        android:layout_marginStart="4dp"
+        android:layout_marginTop="12dp"
+        android:layout_marginEnd="16dp"
+        android:contentDescription="@string/cabinet"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/status"
+        app:layout_constraintTop_toBottomOf="@+id/serialNimberEditLayout" />
 
-<TextView
-    android:id="@+id/status"
-    android:layout_width="55dp"
-    android:layout_height="20dp"
-    android:layout_marginStart="16dp"
-    android:layout_marginTop="28dp"
-    android:text="@string/status"
-    app:layout_constraintStart_toStartOf="parent"
-    app:layout_constraintTop_toBottomOf="@+id/serialNimberEditLayout" />
+    <TextView
+        android:id="@+id/status"
+        android:layout_width="wrap_content"
+        android:layout_height="20dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="28dp"
+        android:text="@string/status"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/serialNimberEditLayout" />
 
     <TextView
         android:id="@+id/oldUser"
-        android:layout_width="380dp"
+        android:layout_width="match_parent"
         android:layout_height="50dp"
         android:layout_marginStart="16dp"
-        android:layout_marginTop="12dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="16dp"
         android:text="@string/oldUser"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/spinnerStatus" />
 
-<TextView
-    android:id="@+id/invenNumb"
-    android:layout_width="380dp"
-    android:layout_height="42dp"
-    android:layout_marginStart="16dp"
-    android:layout_marginTop="4dp"
-    android:text="@string/invenNumb"
-    app:layout_constraintStart_toStartOf="parent"
-    app:layout_constraintTop_toBottomOf="@+id/description" />
+    <TextView
+        android:id="@+id/invenNumb"
+        android:layout_width="match_parent"
+        android:layout_height="42dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="4dp"
+        android:layout_marginEnd="16dp"
+        android:text="@string/invenNumb"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/description" />
 
     <Button
         android:id="@+id/dependencyButton"

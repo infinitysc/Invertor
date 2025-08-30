@@ -1,16 +1,52 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <!-- Base application theme. -->
-    <style name="Theme.Invertor" parent="Theme.MaterialComponents.DayNight.DarkActionBar">
-        <!-- Primary brand color. -->
-        <item name="colorPrimary">@color/purple_200</item>
-        <item name="colorPrimaryVariant">@color/purple_700</item>
-        <item name="colorOnPrimary">@color/black</item>
+    <style name="Theme.Invertor" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+        <item name = "colorPrimary">@color/primary_night</item>
+        <item name = "colorOnPrimary">@color/on_primary_night</item>
+        <item name = "colorPrimaryInverse">@color/inverse_primary_night</item>
+        <item name = "colorPrimaryContainer">@color/primary_container_night</item>
+        <item name = "colorOnPrimaryContainer">@color/on_primary_container_night</item>
         <!-- Secondary brand color. -->
-        <item name="colorSecondary">@color/teal_200</item>
-        <item name="colorSecondaryVariant">@color/teal_200</item>
-        <item name="colorOnSecondary">@color/black</item>
-        <!-- Status bar color. -->
-        <item name="android:statusBarColor">?attr/colorPrimaryVariant</item>
-        <!-- Customize your theme here. -->
+        <item name = "colorSecondary">@color/second_night</item>
+        <item name = "colorOnSecondary">@color/on_second_night</item>
+        <item name = "colorSecondaryContainer">@color/secondary_container_night</item>
+        <item name = "colorOnSecondaryContainer">@color/on_secondary_container_night</item>
+
+        <!-- Third brand color. -->
+        <item name = "colorTertiary">@color/third_night</item>
+        <item name = "colorTertiaryContainer">@color/third_container_night</item>
+        <item name = "colorOnTertiary">@color/on_third_night</item>
+        <item name = "colorOnTertiaryContainer">@color/on_third_container_night</item>
+
+        <!-- Surface color. -->
+        <item name = "colorSurfaceDim">@color/surface_dim_night</item>
+        <item name = "colorSurface">@color/surface_night</item>
+        <item name = "colorSurfaceBright">@color/surface_bright_night</item>
+        <item name = "colorSurfaceContainerLowest">@color/surface_container_lowest_night</item>
+        <item name = "colorSurfaceContainerLow">@color/surface_container_low_night</item>
+        <item name = "colorSurfaceContainer">@color/surface_container_night</item>
+        <item name = "colorSurfaceContainerHigh">@color/surface_container_high_night</item>
+        <item name = "colorSurfaceContainerHighest">@color/surface_container_highest_night</item>
+        <item name = "colorOnSurface">@color/on_surface_night</item>
+        <item name = "colorOnSurfaceVariant">@color/on_surface_variant_night</item>
+        <item name = "colorSurfaceInverse">@color/inverse_surface_night</item>
+        <item name = "colorOnSurfaceInverse">@color/inverse_on_surface_night</item>
+
+
+        <item name = "contentScrim">@color/scrim</item>
+        <item name = "android:shadowColor">@color/shadow</item>
+
+        <item name = "colorError">@color/error_night</item>
+        <item name = "colorOnError">@color/on_error_night</item>
+        <item name = "colorErrorContainer">@color/error_container_night</item>
+        <item name = "colorOnErrorContainer">@color/on_error_container_night</item>
+
+
+
+        <item name ="colorOutline">@color/outline_night</item>
+        <item name="colorOutlineVariant">@color/outline_variant_night</item>
+
+        <item name = "android:statusBarColor">?attr/colorPrimaryContainer</item>
+        <item name="imageButtonStyle">@style/Base.Widget.AppCompat.ImageButton.night</item>
     </style>
 </resources>

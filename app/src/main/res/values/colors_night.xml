@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="primary_night">#dbc66e</color>
+    <color name="on_primary_night">#3a3000</color>
+
+    <color name="second_night">#d1c6a1</color>
+    <color name="on_second_night">#363016</color>
+
+    <color name="third_night">#a9d0b3</color>
+    <color name="on_third_night">#143723</color>
+
+    <color name="primary_container_night">#534600</color>
+    <color name="on_primary_container_night">#f8e287</color>
+
+    <color name="secondary_container_night">#4e472a</color>
+    <color name="on_secondary_container_night">#eee2bc</color>
+
+    <color name="third_container_night">#2c4e38</color>
+    <color name="on_third_container_night">#c5ecce</color>
+
+    <!-- Error -->
+    <color name = "error_night">#ffb4ab</color>
+    <color name = "on_error_night">#690005</color>
+    <color name = "error_container_night">#93000a</color>
+    <color name = "on_error_container_night">#ffdad6</color>
+
+    <!-- Surface -->
+    <color name = "surface_dim_night">#15130b</color>
+    <color name = "surface_night">#15130b</color>
+    <color name = "surface_bright_night">#3c3930</color>
+    <color name = "surface_container_lowest_night">#100e07</color>
+    <color name = "surface_container_low_night">#1e1b13</color>
+    <color name = "surface_container_night">#222017</color>
+    <color name = "surface_container_high_night">#2d2a21</color>
+    <color name = "surface_container_highest_night">#38352b</color>
+    <color name = "on_surface_night">#e8e2d4</color>
+    <color name = "on_surface_variant_night">#cdc6b4</color>
+
+    <color name = "outline_night">#969080</color>
+    <color name = "outline_variant_night">#4b4739</color>
+
+    <color name = "inverse_surface_night">#e8e2d4</color>
+    <color name = "inverse_on_surface_night">#333027</color>
+    <color name = "inverse_primary_night">#6d5e0f</color>
+
+</resources>
