@@ -1,6 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<resources>
-    <style name="Base.Widget.AppCompat.ImageButton.night">
-        <item name="android:background">@color/primary_night</item>
-    </style>
-</resources>
