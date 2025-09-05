@@ -1,6 +1,7 @@
 package com.build.invertor.model.modelOld.json.csv
 
 import android.content.Context
+import com.build.invertor.model.database.data.UserEntity
 import org.apache.poi.ss.usermodel.*
 import org.apache.poi.xssf.usermodel.XSSFWorkbook
 import org.jetbrains.annotations.TestOnly
@@ -17,6 +18,7 @@ class DataDownloader @Inject constructor(
 
     private val workBook : Workbook = XSSFWorkbook(path)
     private val list : MutableList<User> = mutableListOf()
+    private val listDb : MutableList<UserEntity> = mutableListOf()
 
     init {
         inExcel(workSheet = workBook.getSheetAt(0),)
@@ -36,8 +38,13 @@ class DataDownloader @Inject constructor(
                         User(
                         listEditedString[0].toInt(),
                         listEditedString[1],
-                        listEditedString[2]
+                        listEditedString[2])
                     )
+                    listDb.add(
+                        UserEntity(
+                            listEditedString[0].toInt(),
+                            listEditedString[1],
+                            listEditedString[2])
                     )
                 }
             }
@@ -67,6 +74,11 @@ class DataDownloader @Inject constructor(
     override fun getList() : List<User>?  {
         return this.list.ifEmpty {
             null
+        }
+    }
+    fun getListDb() : List<UserEntity> {
+        return this.listDb.ifEmpty {
+            emptyList<UserEntity>()
         }
     }
 

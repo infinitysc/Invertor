@@ -14,6 +14,7 @@
         android:layout_marginTop="150dp"
         android:layout_marginEnd="24dp"
         android:layout_weight="1"
+        android:contentDescription="go to loader fragment"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:srcCompat="@drawable/icons8_settings_50" />
@@ -40,7 +41,8 @@
         android:layout_marginTop="25dp"
         android:layout_marginEnd="16dp"
         android:gravity="center"
-        android:text="@string/chooseUserAuto"
+        android:hint="@string/chooseUserAuto"
+
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/imageButton" />
@@ -52,6 +54,8 @@
         android:layout_marginStart="16dp"
         android:layout_marginTop="12dp"
         android:layout_marginEnd="16dp"
+        android:gravity="center|start"
+        android:paddingStart="14dp"
         android:text="@string/departament"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -82,6 +86,7 @@
         android:layout_marginStart="16dp"
         android:layout_marginTop="12dp"
         android:layout_marginEnd="16dp"
+        android:paddingStart="8dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/cabinet" />

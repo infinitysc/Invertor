@@ -1,15 +1,10 @@
 package com.build.invertor.mainModule.start
 
-import android.app.Application
 import android.content.Context
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.util.Log
-import android.view.ActionMode
-import android.view.GestureDetector
 import android.view.LayoutInflater
-import android.view.MenuItem
-import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
@@ -24,15 +19,13 @@ import android.widget.Toast
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.lifecycleScope
 import com.build.Invertor.R
 import com.build.invertor.mainModule.application.App
 
 import com.build.invertor.mainModule.camera.CameraFragmentNew
-import com.build.invertor.mainModule.settings.Settings
+import com.build.invertor.mainModule.settings.LoaderFragment
 import com.build.invertor.model.modelOld.json.csv.NewUser
 import com.google.android.material.textfield.TextInputEditText
-import kotlinx.coroutines.launch
 import java.io.BufferedReader
 import java.io.IOException
 import java.io.InputStream
@@ -68,7 +61,7 @@ class StartFragmentNew : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
 
-        return inflater.inflate(R.layout.activity_main,container,false)
+        return inflater.inflate(R.layout.start_layout,container,false)
     }
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -160,7 +153,7 @@ class StartFragmentNew : Fragment() {
         imageButtton.setOnClickListener{
             Log.d("FragmentReplace","Cast to SettingsFragment")
             requireActivity().supportFragmentManager.beginTransaction()
-                .replace(R.id.mainFrameLayout, Settings())
+                .replace(R.id.mainFrameLayout, LoaderFragment())
                 .addToBackStack("start")
                 .commit()
         }

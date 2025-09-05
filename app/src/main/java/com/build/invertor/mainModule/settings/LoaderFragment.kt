@@ -1,7 +1,6 @@
 package com.build.invertor.mainModule.settings
 
 import android.app.Activity
-import android.app.Application
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -17,35 +16,33 @@ import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import androidx.documentfile.provider.DocumentFile
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import com.build.Invertor.R
 import com.build.invertor.mainModule.application.App
-import com.build.invertor.model.database.Repository
+import com.build.invertor.mainModule.viewModelFactory.DaggerViewModelFactory
 import java.io.*
 import javax.inject.Inject
-import androidx.core.content.edit
-import com.build.invertor.model.database.AppDataBase
 
-class Settings : Fragment() {
+class LoaderFragment : Fragment() {
 
     private lateinit var importButton : Button
     private lateinit var exportButton : Button
     private lateinit var importExcelButton : Button
-    private lateinit var instanceDatabase : Repository
+
 
     private var selectedExcelFileUri : Uri? = null
     private var saveFileName: String? = null
     private var selectedJsonFileUri: Uri? = null
 
     @Inject
-    fun create(rep : Repository) {
-        instanceDatabase = rep
-    }
+    lateinit var factory : DaggerViewModelFactory
+
+    private val viewModel: LoaderViewModel by viewModels { factory }
 
     override fun onAttach(context: Context) {
+        (requireActivity().application as App).dagger.injectLoaderFragment(this)
         super.onAttach(context)
-        (requireActivity().application as App).dagger.injectSettings(this)
     }
 
     override fun onCreateView(
@@ -53,7 +50,7 @@ class Settings : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        return inflater.inflate(R.layout.setttings_fragment,container,false)
+        return inflater.inflate(R.layout.loader_fragment,container,false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -71,13 +68,21 @@ class Settings : Fragment() {
             provideComplete{
                 intentConfiguratorExcel()
             }
+
+            viewModel.loadFromFileExcel(File(requireContext().filesDir,"data.xlsx"))
+
         }
 
         importButton.setOnClickListener(){
             provideComplete {
                 launchJsonFilePicker()
             }
+
+            viewModel.loadFromFileJson(File(requireContext().filesDir,"jso.json"))
+
         }
+
+
 
         exportButton.setOnClickListener(){
             provideComplete {

@@ -12,9 +12,8 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class Repository @Inject constructor(private val context : Context) {
+class Repository @Inject constructor(private val database : AppDataBase) {
 
-    private val database : AppDataBase = Room.databaseBuilder(context,AppDataBase::class.java,"AppDatabase").build()
     private val daoUser = database.getDaoUser()
     private val daoCard = database.getDaoCard()
     suspend fun insertUser(user : UserEntity) {
@@ -46,7 +45,13 @@ class Repository @Inject constructor(private val context : Context) {
 
     suspend fun getListCod1c(code : String) : List<CardEntity> {
         return withContext(Dispatchers.IO){
-            return@withContext daoCard.selectListCard(code)
+            return@withContext daoCard.selectListCardUseCode1C(code)
+        }
+    }
+
+    suspend fun getListInventoryNumber(inventoryNumber : String) : List<CardEntity> {
+        return withContext(Dispatchers.IO){
+            return@withContext daoCard.selectListCardUseInventoryNumber(inventoryNumber)
         }
     }
 

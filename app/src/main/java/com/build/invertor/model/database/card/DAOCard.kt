@@ -11,7 +11,10 @@ import androidx.room.Update
 interface DAOCard {
 
     @Query("SELECT * FROM Card WHERE Code1C = :cod1c")
-    suspend fun selectListCard(cod1c : String) : List<CardEntity>
+    suspend fun selectListCardUseCode1C(cod1c : String) : List<CardEntity>
+
+    @Query(value = "SELECT * FROM Card WHERE InventNumb = :inventoryNumber")
+    suspend fun selectListCardUseInventoryNumber(inventoryNumber : String) : List<CardEntity>
 
     @Query("SELECT * FROM Card WHERE id =:index_")
     suspend fun selectCard(index_ : Int) : CardEntity

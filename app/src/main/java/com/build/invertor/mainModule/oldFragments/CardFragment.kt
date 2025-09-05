@@ -1,5 +1,6 @@
-package com.build.invertor.mainModule.Card
+package com.build.invertor.mainModule.oldFragments
 
+import android.Manifest
 import android.app.AlertDialog
 import android.content.Context
 import android.content.pm.PackageManager
@@ -11,8 +12,12 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.*
-import android.widget.AdapterView.OnItemSelectedListener
+import android.widget.AdapterView
+import android.widget.ArrayAdapter
+import android.widget.Button
+import android.widget.Spinner
+import android.widget.TextView
+import android.widget.Toast
 import androidx.appcompat.widget.SwitchCompat
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
@@ -20,6 +25,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.lifecycleScope
 import com.build.Invertor.R
+import com.build.invertor.mainModule.Card.BabyCardFragment
 import com.build.invertor.model.modelOld.json.csv.NewUser
 import com.build.invertor.model.modelOld.json.json.CardInventory
 import com.google.android.material.textfield.TextInputEditText
@@ -35,11 +41,10 @@ import java.io.File
 import java.io.FileOutputStream
 import java.io.FileWriter
 import java.io.IOException
+import java.lang.IllegalStateException
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
-
-
-
+import kotlin.collections.iterator
 
 /**
  * Фрагмент в котором идет заполенение карточки устройства и привязка его к сотруднику.
@@ -62,7 +67,7 @@ class CardFragment : Fragment(){
     // controller
     private var max : Int = 0
 
-    private val sound : MediaPlayer by lazy { MediaPlayer.create(requireContext(),R.raw.scanner_beep) }
+    private val sound : MediaPlayer by lazy { MediaPlayer.create(requireContext(), R.raw.scanner_beep) }
 
     // controller
     private var user : NewUser? = null
@@ -111,7 +116,7 @@ class CardFragment : Fragment(){
         inventNumb = view.findViewById(R.id.invenNumb)
         serialInputLayoyt = view.findViewById(R.id.serialNimberEditLayout)
         dependencyButton = view.findViewById(R.id.dependencyButton)
-        spinnerStatus.adapter = ArrayAdapter(activityContext,R.layout.spinner,listSpin)
+        spinnerStatus.adapter = ArrayAdapter(activityContext, R.layout.spinner, listSpin)
 
         if(card?.Status != null) {
             spinnerStatus.setSelection(listSpin.indexOf(card?.Status))
@@ -125,7 +130,7 @@ class CardFragment : Fragment(){
 
         try {
             nameFile = this.requireArguments().getString("json").toString()
-        }catch (e : java.lang.IllegalStateException){
+        }catch (e : IllegalStateException){
             e.printStackTrace()
             Log.e("NameFile","bundle пустой")
         }
@@ -137,48 +142,50 @@ class CardFragment : Fragment(){
 
     // controller
     private fun getMax() : Int {
-        val file = File(requireContext().cacheDir,"max.txt")
+        val file = File(requireContext().cacheDir, "max.txt")
         return file.readText().toInt()
     }
     // controller
     private fun updateMax(){
-        FileWriter(File(requireContext().cacheDir,"max.txt")).use {
+        FileWriter(File(requireContext().cacheDir, "max.txt")).use {
             it.write((max).toString()) //?
             it.flush()
         }
     }
 
-    private fun alert() : AlertDialog{
+    private fun alert() : AlertDialog {
         var value = ""
         val dialogView = LayoutInflater.from(requireContext()).inflate(R.layout.serial_camera_layout,null)
         val scopeScanner = dialogView.findViewById<BarcodeView>(R.id.alertScanner)
         val torch = dialogView.findViewById<SwitchCompat>(R.id.torch)
 
         val callback = BarcodeCallback {
-            if(it != null){
+            if (it != null) {
                 scopeScanner.setTorch(false)
                 sound.start()
                 value = it.text
                 scopeScanner.pause()
-                Toast.makeText(requireContext(),"Успешное сканирование",Toast.LENGTH_SHORT).show()
-                Log.d("Scanner","сканирование выполнилось $this")
+                Toast.makeText(requireContext(), "Успешное сканирование", Toast.LENGTH_SHORT).show()
+                Log.d("Scanner", "сканирование выполнилось $this")
             }
         }
 
         scopeScanner.decodeContinuous(callback)
-        scopeScanner.decoderFactory = DefaultDecoderFactory(listOf(
-            BarcodeFormat.CODE_93,
-            BarcodeFormat.CODE_128,
-            BarcodeFormat.CODE_39,
-            BarcodeFormat.EAN_8,
-            BarcodeFormat.EAN_13,
-            BarcodeFormat.QR_CODE,
-            BarcodeFormat.ITF,
-            BarcodeFormat.UPC_EAN_EXTENSION,
-            BarcodeFormat.UPC_E,
-            BarcodeFormat.UPC_A,
-            BarcodeFormat.CODABAR
-        ))
+        scopeScanner.decoderFactory = DefaultDecoderFactory(
+            listOf(
+                BarcodeFormat.CODE_93,
+                BarcodeFormat.CODE_128,
+                BarcodeFormat.CODE_39,
+                BarcodeFormat.EAN_8,
+                BarcodeFormat.EAN_13,
+                BarcodeFormat.QR_CODE,
+                BarcodeFormat.ITF,
+                BarcodeFormat.UPC_EAN_EXTENSION,
+                BarcodeFormat.UPC_E,
+                BarcodeFormat.UPC_A,
+                BarcodeFormat.CODABAR
+            )
+        )
 
         scopeScanner.resume()
 
@@ -217,7 +224,7 @@ class CardFragment : Fragment(){
 
 
         alert()
-        spinnerStatus.onItemSelectedListener = object : OnItemSelectedListener {
+        spinnerStatus.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(
                 parent: AdapterView<*>?,
                 view: View?,
@@ -264,8 +271,9 @@ class CardFragment : Fragment(){
                     activityFragmentManager.popBackStack()
             }
             else{
-                if(ContextCompat.checkSelfPermission(activityContext,android.Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED){
-                    ActivityCompat.requestPermissions(requireActivity(), arrayOf(android.Manifest.permission.WRITE_EXTERNAL_STORAGE),1)
+                if(ContextCompat.checkSelfPermission(activityContext,
+                        Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED){
+                    ActivityCompat.requestPermissions(requireActivity(), arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE),1)
                 }
                 else {
                     var change = 0
@@ -310,13 +318,14 @@ class CardFragment : Fragment(){
             )
             if(papaCard.UEID == null){
                 //useToast
-                Toast.makeText(requireContext(),"Из дочернего обьекта сделать дочерний невозможно!",Toast.LENGTH_SHORT).show()
+                Toast.makeText(requireContext(),"Из дочернего обьекта сделать дочерний невозможно!",
+                    Toast.LENGTH_SHORT).show()
             }
             else {
                 requireActivity().supportFragmentManager.beginTransaction()
                     .replace(
                         R.id.mainFrameLayout,
-                        BabyCardFragment.newInstance(papaCard, this.user!!)
+                        BabyCardFragment.Companion.newInstance(papaCard, this.user!!)
                     )
                     .addToBackStack("dependency_Card")
                     .commit()
@@ -335,7 +344,7 @@ class CardFragment : Fragment(){
             .serializeNulls()
             .create()
         val fileCacheDir = requireContext().cacheDir
-        val file = File(fileCacheDir,fileNameFromCache)
+        val file = File(fileCacheDir, fileNameFromCache)
         if(file.exists()){
             val type = object : TypeToken<List<CardInventory>>() {}.type
             val listData = gsonEngine.fromJson<List<CardInventory>>(file.readText(),type)
@@ -425,7 +434,8 @@ class CardFragment : Fragment(){
     //delete
     private fun saveJson(jsonStr : String , fileName : String = "${user?.user?.id}_${getCurrentTime().replace(":", "-")}.json"){
         if (Environment.getExternalStorageState() == Environment.MEDIA_MOUNTED) {
-            val folder = File(activityContext.getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS), "json")
+            val folder =
+                File(activityContext.getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS), "json")
             if (!folder.exists()) {
                 val dirCreated = folder.mkdirs()
                 if (dirCreated) {
@@ -469,13 +479,17 @@ class CardFragment : Fragment(){
             UEID = card.UEID,
             UEDescription = card.UEDescription,
             ActionDateTime = date,
-            Adress = user.adress ,
+            Adress = user.adress,
             Status = status,
             inventNumb = card.inventNumb,
             SerialNumb = newSerialNumberString,
             IsSNEdited = change,
             UserName = "${user.user?.id}|${user.user?.userName}",
-            Description = if(note == ""){null}else{note},
+            Description = if (note == "") {
+                null
+            } else {
+                note
+            },
             Cabinet = cabinet,
             Cod1C = card.Cod1C,
             parentEqueipment = card.parentEqueipment

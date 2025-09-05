@@ -22,7 +22,7 @@ import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import com.build.Invertor.R
-import com.build.invertor.mainModule.settings.Settings
+import com.build.invertor.mainModule.settings.LoaderFragment
 import com.build.invertor.mainModule.start.StartFragmentController
 import com.build.invertor.model.modelOld.json.csv.DataDownloader
 import com.build.invertor.model.modelOld.json.csv.NewUser
@@ -104,7 +104,7 @@ class StartFragment  : Fragment(){
         savedInstanceState: Bundle?
     ): View? {
 
-        return inflater.inflate(R.layout.activity_main,container,false)
+        return inflater.inflate(R.layout.start_layout,container,false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -178,7 +178,7 @@ class StartFragment  : Fragment(){
         imageButtton.setOnClickListener{
             Log.d("FragmentReplace","Cast to SettingsFragment")
             activityFragmentManager.beginTransaction()
-                .replace(R.id.mainFrameLayout, Settings())
+                .replace(R.id.mainFrameLayout, LoaderFragment())
                 .addToBackStack("start")
                 .commit()
         }

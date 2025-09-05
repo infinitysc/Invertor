@@ -9,7 +9,8 @@ import androidx.room.PrimaryKey
 @Entity(tableName = "Card")
 data class CardEntity (
 
-    @PrimaryKey @ColumnInfo("id")
+    @PrimaryKey(autoGenerate = false)
+    @ColumnInfo("id")
     val index : Int ,
     @ColumnInfo("SID")
     var SID : Int ,

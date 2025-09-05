@@ -7,7 +7,7 @@ import androidx.room.PrimaryKey
 @Entity(tableName = "UserCard")
 data class UserEntity (
     @ColumnInfo("id")
-    @PrimaryKey
+    @PrimaryKey(autoGenerate = false)
     var id : Int,
     @ColumnInfo("user")
     var user : String,
