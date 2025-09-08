@@ -2,6 +2,7 @@ package com.build.invertor.mainModule.settings
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.loader.content.Loader
 import com.build.invertor.model.database.Repository
 import com.build.invertor.model.database.card.CardEntity
 import com.build.invertor.model.database.data.UserEntity
@@ -13,6 +14,7 @@ import java.io.File
 import javax.inject.Inject
 
 class LoaderViewModel @Inject constructor(private val repository: Repository) : ViewModel(){
+
 
     private fun createFromFileJsonList(file : File) : List<CardEntity> {
         return JsonFileOpener(file.inputStream(), GsonBuilder().create()).openForDatabase()

@@ -17,10 +17,22 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.widget.SwitchCompat
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.flowWithLifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.build.Invertor.R
+import com.build.Invertor.databinding.NewCameraFragmentLayoutBinding
 import com.build.invertor.mainModule.Card.CardFragmentNew
 import com.build.invertor.mainModule.application.App
+import com.build.invertor.mainModule.application.appComponent
 import com.build.invertor.mainModule.listFragment.ListChoiceFragment
+import com.build.invertor.mainModule.utils.CameraUtils
+import com.build.invertor.mainModule.viewModelFactory.DaggerViewModelFactory
+import com.build.invertor.model.database.card.CardEntity
+import com.build.invertor.model.database.card.Codes
 import com.build.invertor.model.modelOld.json.csv.NewUser
 import com.build.invertor.model.modelOld.json.json.CardInventory
 import com.google.zxing.BarcodeFormat
@@ -28,44 +40,46 @@ import com.journeyapps.barcodescanner.BarcodeCallback
 import com.journeyapps.barcodescanner.BarcodeView
 import com.journeyapps.barcodescanner.DefaultDecoderFactory
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import javax.inject.Inject
 
 class CameraFragmentNew : Fragment(){
 
-    private lateinit var buttonToNextFragment : Button
-    private lateinit var valueText : TextView
-    private lateinit var userText : TextView
-    private lateinit var barcodeView : BarcodeView
-    private lateinit var switch : SwitchCompat
-    private lateinit var refresh : ImageView
 
+    private var list : List<CardEntity> = emptyList()
+
+    private val binding : NewCameraFragmentLayoutBinding by lazy {
+        NewCameraFragmentLayoutBinding.inflate(layoutInflater)
+    }
+
+    private var codes : List<String?> = emptyList()
+
+    @Inject
+    lateinit var factory : DaggerViewModelFactory
+
+    private val viewModel : CameraViewModel by viewModels { factory }
 
     private lateinit var controller: CameraController
 
     private val sound : MediaPlayer by lazy { MediaPlayer.create(requireContext(), R.raw.scanner_beep) }
     private var valueString : String = "defaultStringValue"
     private var user : NewUser? = null
-    private val formats = listOf(
-        BarcodeFormat.CODE_39,
-        BarcodeFormat.CODE_128,
-        BarcodeFormat.CODE_93,
-        BarcodeFormat.EAN_13,
-        BarcodeFormat.EAN_8,
-    )
-
-    @Inject
-    fun setController(cameraController: CameraController) {
-        controller = cameraController
-    }
 
     private val callback = BarcodeCallback { result ->
         if(result != null){
             sound.start()
-            valueText.text = result.text
+            binding.value.text = result.text
             valueString = result.text
-            barcodeView.pause()
+            viewModel.setNewValueTo(valueString)
+            binding.barcodeView.pause()
         }
+    }
+
+
+        override fun onAttach(context: Context) {
+        context.appComponent.injectCameraFragment(this)
+        super.onAttach(context)
     }
 
     override fun onCreateView(
@@ -74,7 +88,7 @@ class CameraFragmentNew : Fragment(){
         savedInstanceState: Bundle?
     ): View? {
         Log.d("camera","$this create")
-        return inflater.inflate(R.layout.new_camera_fragment_layout,container,false)
+        return binding.root
     }
 
 
@@ -85,37 +99,55 @@ class CameraFragmentNew : Fragment(){
             user = arguments?.getParcelable("user")
         }
 
-        buttonToNextFragment = view.findViewById(R.id.button_to_next_fragment)
-        valueText = view.findViewById(R.id.value)
-        userText = view.findViewById(R.id.userValue)
-        barcodeView = view.findViewById(R.id.barcode_view)
-        switch = view.findViewById(R.id.switch_torch)
-        refresh = view.findViewById(R.id.refreshButton)
-        userText.text = user!!.user?.userName
-        barcodeView.decoderFactory = DefaultDecoderFactory(formats)
-        barcodeView.decodeContinuous(callback)
+        lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.CREATED){
+                viewModel.flo.collect { it ->
+                    codes = CameraUtils.listCodesToListString(it)
+                }
+            }
+        }
 
+        viewModel.valueString.observe(viewLifecycleOwner) {
+            if(it != "" || it != "defaultValue") {
+                viewModel.createFlowData(it)
+            }
+        }
+
+        lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.CREATED){
+                viewModel.m.collect {
+                    list = it
+                    Log.i("FLOW","$it")
+                }
+            }
+        }
+
+        binding.userValue.text = user!!.user?.userName
+        binding.barcodeView.decoderFactory = DefaultDecoderFactory(viewModel.formats)
+        binding.barcodeView.decodeContinuous(callback)
+        binding.testCard.text = "${user!!.user},${user!!.adress},${user!!.cabinet}"
     }
 
     override fun onStart() {
         super.onStart()
-        (requireActivity().application as App).dagger.injectCameraFragment(this)
-        valueText.setOnClickListener {
+
+        binding.value.setOnClickListener {
             val alert = AlertDialog.Builder(requireContext())
             alert.setTitle("Редактирование текста")
 
-            val array : ArrayAdapter<String?> = ArrayAdapter(requireContext(),R.layout.spinner,controller.getJsonFile()!!.getListCode())
+            val array = ArrayAdapter(requireContext(),R.layout.spinner,codes)
             val autocom = AutoCompleteTextView(requireContext())
             autocom.setAdapter(array)
 
-            val editText = EditText(requireContext())
-            editText.setText(valueText.text)
+            //что тут делал editText??
+
+            Log.i("CODE","$codes")
 
             alert.setView(autocom)
-
             alert.setPositiveButton("OK") { dialog, which ->
-                valueText.setText(autocom.text.toString())
+                binding.value.setText(autocom.text.toString())
                 valueString = autocom.text.toString()
+                viewModel.setNewValueTo(autocom.text.toString())
                 dialog.dismiss()
             }
             alert.setNegativeButton("Отмена") { dialog,which->
@@ -124,42 +156,50 @@ class CameraFragmentNew : Fragment(){
             val dialog = alert.create()
             dialog.show()
         }
-        barcodeView.resume()
-        refresh.setOnClickListener{
-            barcodeView.pause()
-            barcodeView.resume()
-            valueText.text = ""
+
+        binding.barcodeView.resume()
+
+        binding.refreshButton.setOnClickListener{
+            binding.barcodeView.pause()
+            binding.barcodeView.resume()
+            viewModel.setNewValueTo("")
+            binding.value.text = ""
         }
-        switch.setOnCheckedChangeListener{_ , isCheked ->
+
+        binding.switchTorch.setOnCheckedChangeListener{_ , isCheked ->
             Log.d("Scanner","фонарик $this")
             if(isCheked){
-                barcodeView.setTorch(true)
+                binding.barcodeView.setTorch(true)
             }
             else {
-                barcodeView.setTorch(false)
+                binding.barcodeView.setTorch(false)
             }
 
         }
-        buttonToNextFragment.setOnClickListener{
-            val card = controller.searchDataByNumber(valueString)
-            when(controller.checkCard(card)){
-                StateCard.EMPTY -> useToast("Сканируйте или введите значение")
-                StateCard.ONE_ELEMENT -> startCardFragment(card)
-                StateCard.MULTIPLY_ELEMENTS -> startListFragment(card)
+
+        Log.i("CODE","$codes")
+        binding.buttonToNextFragment.setOnClickListener {
+            if(list.isNotEmpty()) {
+                when(viewModel.checkCard(list)) {
+                    StateCard.EMPTY -> useToast("Сканируйте или введите значение")
+                    StateCard.ONE_ELEMENT -> startCardFragment(list)
+                    StateCard.MULTIPLY_ELEMENTS -> startListFragment(list)
+                }
             }
         }
     }
 
-    private fun startCardFragment(card : List<CardInventory>) {
-        val bundle = createBundle(this.user!!,card[0])
+    private fun startCardFragment(card : List<CardEntity>) {
+
+        val bundle = createBundle(this.user!!,card[0].index)
         requireActivity().supportFragmentManager.beginTransaction()
             .replace(R.id.mainFrameLayout, CardFragmentNew.newInstance(bundle))
             .addToBackStack("papa")
             .commit()
     }
 
-    private fun startListFragment(card : List<CardInventory>) {
-        controller.cacheSaver(card, user?.user?.userName ?: "USER IS NULLABLE".apply {
+    private fun startListFragment(card : List<CardEntity>) {
+        controller.cacheSaver(carde(card), user?.user?.userName ?: "USER IS NULLABLE".apply {
             useToast("ПОЛЬЗОВАТЕЛЬ ПУСТОЙ !!")
         })
         val bundle = Bundle()
@@ -170,7 +210,7 @@ class CameraFragmentNew : Fragment(){
         }
         requireActivity().supportFragmentManager.beginTransaction()
             .replace(R.id.mainFrameLayout, ListChoiceFragment.newInstance(
-                card,
+                carde(card),
                 this.user!!,
                 bundle
             ))
@@ -179,16 +219,45 @@ class CameraFragmentNew : Fragment(){
 
     }
 
-    private fun createBundle(user : NewUser,card : CardInventory) : Bundle {
+    fun carde(listing : List<CardEntity>) : List<CardInventory> {
+
+        val m = mutableListOf<CardInventory>()
+        listing.forEach { it ->
+            m.add(it.toCardInventory())
+        }
+        return m
+    }
+
+    fun CardEntity.toCardInventory() : CardInventory {
+        return CardInventory(
+            index = this.index,
+            SID = this.SID ,
+            UEID = this.UEID,
+            UEDescription = this.UEDescription,
+            ActionDateTime = this.ActionDateTime,
+            Adress = this.Adress,
+            Status = this.Status,
+            inventNumb = this.inventNumb,
+            SerialNumb =this.SerialNumb,
+            IsSNEdited = this.IsSNEdited,
+            UserName = this.UserName,
+            Description = this.Description ,
+            Cabinet = this.Cabinet,
+            Cod1C = this.Cod1C,
+            parentEqueipment = this.parentEqueipment,
+        )
+    }
+    private fun createBundle(user : NewUser,cardIndex : Int) : Bundle {
         return Bundle().apply {
             putParcelable("user",user)
-            putParcelable("card",card)
+            putInt("cardIndex",cardIndex)
         }
     }
 
     private fun useToast(text : String) {
         Toast.makeText(requireContext(),text, Toast.LENGTH_SHORT).show()
     }
+
     companion object{
         fun newInstance(bundle : Bundle) : CameraFragmentNew {
             val fragment = CameraFragmentNew()

@@ -2,6 +2,8 @@ package com.build.invertor.mainModule.application
 
 import android.app.Application
 import Debug.logCatLogger.LogCatSaver
+import android.content.Context
+import com.build.invertor.di.AppComponent
 import com.build.invertor.di.DaggerAppComponent
 import com.build.invertor.model.database.Repository
 
@@ -14,21 +16,15 @@ import javax.inject.Inject
 
 class App : Application() {
 
-    val dagger = DaggerAppComponent.factory().create(this)
+    lateinit var appComponent: AppComponent
 
     private lateinit var logCatSaver: LogCatSaver
 
 
-    private lateinit var repository: Repository
-
-
-    fun createRepository() {
-        dagger.injectDatabase(this)
-        repository
-    }
 
     override fun onCreate() {
         super.onCreate()
+        appComponent = DaggerAppComponent.factory().create(this)
         logCatSaver = LogCatSaver(this)
         logCatSaver.startLogging()
 
@@ -63,3 +59,8 @@ class App : Application() {
 
 }
 
+val Context.appComponent : AppComponent
+    get() = when(this){
+        is App -> this.appComponent
+        else -> this.applicationContext.appComponent
+    }

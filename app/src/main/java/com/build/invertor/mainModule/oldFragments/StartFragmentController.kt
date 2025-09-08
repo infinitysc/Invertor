@@ -1,4 +1,4 @@
-package com.build.invertor.mainModule.start
+package com.build.invertor.mainModule.oldFragments
 
 import android.content.Context
 import android.util.Log
@@ -7,12 +7,11 @@ import com.build.invertor.model.modelOld.json.csv.DataDownloader
 import com.build.invertor.model.modelOld.json.csv.User
 import com.build.invertor.model.modelOld.json.json.JsonDownloader
 import java.io.BufferedReader
-import java.io.File
 import java.io.IOException
 import java.io.InputStream
 import java.io.InputStreamReader
 import javax.inject.Inject
-import javax.inject.Named
+import kotlin.collections.forEach
 
 class StartFragmentController @Inject constructor(
     private val context : Context

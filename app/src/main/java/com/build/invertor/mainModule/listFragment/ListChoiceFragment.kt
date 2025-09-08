@@ -1,5 +1,6 @@
 package com.build.invertor.mainModule.listFragment
 
+import android.content.Context
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -12,8 +13,9 @@ import androidx.fragment.app.FragmentManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.build.Invertor.R
-import com.build.invertor.mainModule.oldFragments.CardFragment
+import com.build.invertor.mainModule.Card.CardFragment
 import com.build.invertor.mainModule.application.App
+import com.build.invertor.mainModule.application.appComponent
 import com.build.invertor.mainModule.listFragment.recycler.Adapter
 import com.build.invertor.model.modelOld.json.csv.NewUser
 import com.build.invertor.model.modelOld.json.json.CardInventory
@@ -34,11 +36,13 @@ class ListChoiceFragment : Fragment() {
         .create()
 
     private lateinit var controller: ListFragmentController
-    private val dagger = (requireActivity().application as App).dagger
+
     @Inject
     fun injectController(listFragmentController: ListFragmentController) {
         controller = listFragmentController
     }
+
+
 
     private lateinit var recyclerView : RecyclerView
 
@@ -50,10 +54,16 @@ class ListChoiceFragment : Fragment() {
     private var user : NewUser? = null
     private var bundle : Bundle = Bundle()
 
-    private var newListCard : ArrayList<CardInventory>? = null
     private val manager : FragmentManager? by lazy {
         activity?.supportFragmentManager
     }
+
+    override fun onAttach(context: Context) {
+        context.appComponent.injectListFragment(this)
+        super.onAttach(context)
+    }
+
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -65,7 +75,6 @@ class ListChoiceFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        dagger.injectListFragment(this)
 
         try {
             fileName = this.requireArguments().getString("json").toString()
@@ -77,7 +86,7 @@ class ListChoiceFragment : Fragment() {
 
         recyclerView = view.findViewById(R.id.recyclerMama)
         textCod1C = view.findViewById(R.id.cod1c)
-        textCod1C.setText("Код 1С : ${list?.get(0)?.Cod1C ?: ""}")
+        textCod1C.text = ("Код 1С : ${list?.get(0)?.Cod1C ?: ""}")
         recyclerView.layoutManager = LinearLayoutManager(requireContext())
         bundle.putString("json",fileName)
         recyclerView.adapter = Adapter(this.list!!.toMutableList(),this.user!!) { card: CardInventory, user_: NewUser ->
@@ -146,20 +155,20 @@ class ListChoiceFragment : Fragment() {
     }
 
     //bundle
-    fun setList(list_ : List<CardInventory>) {
-        this.list = list_
+    fun setList(list : List<CardInventory>) {
+        this.list = list
     }
     //bundle
-    fun setUser(user_ : NewUser){
-        this.user = user_
+    fun setUser(user : NewUser){
+        this.user = user
     }
 
     companion object {
-        fun newInstance(list_ : List<CardInventory>, user_ : NewUser, bundle : Bundle) : ListChoiceFragment {
+        fun newInstance(list : List<CardInventory>, user : NewUser, bundle : Bundle) : ListChoiceFragment {
             val newFragment = ListChoiceFragment()
             newFragment.arguments = bundle
-            newFragment.setList(list_)
-            newFragment.setUser(user_)
+            newFragment.setList(list)
+            newFragment.setUser(user)
             return newFragment
         }
     }

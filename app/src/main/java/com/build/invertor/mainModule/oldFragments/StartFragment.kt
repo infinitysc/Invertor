@@ -23,7 +23,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import com.build.Invertor.R
 import com.build.invertor.mainModule.settings.LoaderFragment
-import com.build.invertor.mainModule.start.StartFragmentController
+import com.build.invertor.mainModule.oldFragments.StartFragmentController
 import com.build.invertor.model.modelOld.json.csv.DataDownloader
 import com.build.invertor.model.modelOld.json.csv.NewUser
 import com.build.invertor.model.modelOld.json.csv.User

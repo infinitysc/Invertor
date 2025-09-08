@@ -19,40 +19,55 @@ import android.widget.Toast
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import com.build.Invertor.R
+import com.build.Invertor.databinding.StartLayoutBinding
 import com.build.invertor.mainModule.application.App
+import com.build.invertor.mainModule.application.appComponent
 
 import com.build.invertor.mainModule.camera.CameraFragmentNew
 import com.build.invertor.mainModule.settings.LoaderFragment
+import com.build.invertor.mainModule.settings.LoaderViewModel
+import com.build.invertor.mainModule.viewModelFactory.DaggerViewModelFactory
+import com.build.invertor.model.database.data.UserEntity
 import com.build.invertor.model.modelOld.json.csv.NewUser
+import com.build.invertor.model.modelOld.json.csv.User
 import com.google.android.material.textfield.TextInputEditText
+import kotlinx.coroutines.launch
 import java.io.BufferedReader
 import java.io.IOException
 import java.io.InputStream
 import java.io.InputStreamReader
 import java.util.ArrayList
 import javax.inject.Inject
+import kotlin.getValue
 
 class StartFragmentNew : Fragment() {
 
-    private lateinit var imageButtton : ImageButton
-    private lateinit var searchEditText : AutoCompleteTextView
-    private lateinit var button : Button
-    private lateinit var cabinetEditor : TextInputEditText
-    private lateinit var departament : TextView
-    private lateinit var adressSpinner : Spinner
-    //dagger
+
+    private val binding : StartLayoutBinding by lazy {
+        StartLayoutBinding.inflate(layoutInflater)
+    }
+
+    private var user : UserEntity? = null
     @Inject
-    lateinit var controller : StartFragmentController
+    lateinit var factory : DaggerViewModelFactory
 
-
+    private val viewModel: StartViewModel by viewModels { factory }
 
     private val TagUser = "User"
     private var spinAdr = ""
-    private var positionIndex = 0
 
     private val listAdress : List<String> by lazy {
-        txtToList(requireContext().assets.open("iDAdress.txt"))
+        viewModel.txtToList(requireContext().assets.open("iDAdress.txt"))
+    }
+
+    override fun onAttach(context: Context) {
+        context.appComponent.injectStartFragment(this)
+        super.onAttach(context)
     }
 
     override fun onCreateView(
@@ -61,45 +76,44 @@ class StartFragmentNew : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
 
-        return inflater.inflate(R.layout.start_layout,container,false)
+        return binding.root
     }
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
 
-        button = view.findViewById(R.id.start_work_button)
-        searchEditText = view.findViewById(R.id.search_text)
-        departament = view.findViewById(R.id.departament)
-        imageButtton = view.findViewById(R.id.imageButton)
-        cabinetEditor = view.findViewById(R.id.cabinetEdit)
-        adressSpinner = view.findViewById(R.id.adressSpinner)
-
-        (requireActivity().application as App).dagger.injectStartFragment(this)
-    }
-
-    private fun txtToList(input : InputStream) : List<String> {
-        return try {
-            BufferedReader(InputStreamReader(input)).use { reader ->
-                reader.lineSequence().toList()
-            }
-        } catch (e : IOException){
-            e.printStackTrace()
-            listOf<String>()
+        viewModel.departament.observe(viewLifecycleOwner) { collector ->
+            binding.departament.text = collector
         }
+        viewModel.concreteUser.observe(viewLifecycleOwner){
+            user = it
+        }
+
+
+        val array = ArrayAdapter(requireContext(),R.layout.spinner, mutableListOf<String>())
+        binding.searchText.setAdapter(array)
+
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.CREATED) {
+                viewModel.userFlow.collect { users ->
+                    array.clear()
+                    array.addAll(users)
+                    array.notifyDataSetChanged()
+                }
+            }
+        }
+        viewModel.getListUserNamesFlow()
+
     }
+
 
     override fun onStart() {
         super.onStart()
 
 
-        adressSpinner.adapter = ArrayAdapter(requireContext(),R.layout.spinner,listAdress)
+        binding.adressSpinner.adapter = ArrayAdapter(requireContext(),R.layout.spinner,listAdress)
 
-
-        if(controller.checkDataIsNull()){
-            val array = ArrayAdapter(requireContext(),R.layout.spinner,controller.createListUserName())
-
-            searchEditText.setAdapter(array)
-
+        if(viewModel.checkData()){
             useToast("Данные с пользователями загружены")
             Log.d("FileWork","data download to internal storage $this")
 
@@ -108,8 +122,7 @@ class StartFragmentNew : Fragment() {
             Log.d("FileWork","data doesn't download to internal storage $this")
         }
 
-
-        adressSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+        binding.adressSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
 
             override fun onItemSelected(
                 parent: AdapterView<*>?,
@@ -125,11 +138,11 @@ class StartFragmentNew : Fragment() {
             }
 
         }
-        searchEditText.setOnClickListener {
-            searchEditText.setText("")
+        binding.searchText.setOnClickListener {
+            binding.searchText.setText("")
         }
 
-        searchEditText.onItemClickListener = object : AdapterView.OnItemClickListener{
+        binding.searchText.onItemClickListener = object : AdapterView.OnItemClickListener{
 
             override fun onItemClick(
                 parent: AdapterView<*>?,
@@ -137,20 +150,21 @@ class StartFragmentNew : Fragment() {
                 position: Int,
                 id: Long
             ){
-                val userName = searchEditText.text.toString()
-                departament.text = controller.searchDepartament(userName)
+                val userName = binding.searchText.text.toString()
+                viewModel.searchDepartament(userName)
+                viewModel.getUser(userName)
                 val imm = requireActivity().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-                imm.hideSoftInputFromWindow(searchEditText.windowToken, 0)
+                imm.hideSoftInputFromWindow(binding.searchText.windowToken, 0)
                 useToast("Выбран пользователь $userName")
                 Log.d(TagUser,"Selected by the user $this")
             }
         }
 
-        button.setOnClickListener(){
-            launchCameraFragmentOldVersion(200)
+        binding.startWorkButton.setOnClickListener(){
+            launchCameraFragment(200)
         }
 
-        imageButtton.setOnClickListener{
+        binding.imageButton.setOnClickListener{
             Log.d("FragmentReplace","Cast to SettingsFragment")
             requireActivity().supportFragmentManager.beginTransaction()
                 .replace(R.id.mainFrameLayout, LoaderFragment())
@@ -173,6 +187,43 @@ class StartFragmentNew : Fragment() {
         return false
     }
 
+    //change
+    private fun launchCameraFragment(reqCode : Int) {
+        if(ContextCompat.checkSelfPermission(requireContext(),android.Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED){
+            ActivityCompat.requestPermissions(requireActivity(), arrayOf(android.Manifest.permission.CAMERA),reqCode)
+        }
+        else{
+            if(spinAdr != "Выберите адрес"){
+                if(binding.cabinetEdit.text.toString() == "")
+                {
+                    useToast("Введите кабинет(окно)")
+                }
+                else {
+                    if(user != null){
+                        //TODO: Нужна проверка на то что пользователь вообще есть такой.
+                        val newAbsUser = NewUser(
+                            user = User(id = user!!.id ,
+                                departament = user!!.departament,
+                                userName = user!!.user
+                            ),
+                            cabinet = binding.cabinetEdit.text.toString(),
+                            adress = spinAdr )
+                        val bundle = Bundle()
+                        bundle.putParcelable("user",newAbsUser)
+
+                        //TODO: Jetpack Navigation
+                        val newFragment : CameraFragmentNew = CameraFragmentNew.newInstance(bundle)
+                        requireActivity().supportFragmentManager
+                            .beginTransaction()
+                            .replace(R.id.mainFrameLayout,newFragment)
+                            .addToBackStack("StartFragment")
+                            .commit()
+                    }
+                }
+            }
+        }
+    }
+    /*
     private fun launchCameraFragmentOldVersion(reqCode: Int) {
 
         if(ContextCompat.checkSelfPermission(requireContext(),android.Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED){
@@ -241,5 +292,5 @@ class StartFragmentNew : Fragment() {
                 }
             }
         }
-    }
+    }*/
 }

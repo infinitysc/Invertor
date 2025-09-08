@@ -1,6 +1,7 @@
 package com.build.invertor.mainModule.Card
 
 import android.app.AlertDialog
+import android.content.Context
 import android.media.MediaPlayer
 import android.os.Bundle
 import android.util.Log
@@ -15,9 +16,13 @@ import android.widget.Spinner
 import android.widget.TextView
 import androidx.appcompat.widget.SwitchCompat
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import com.build.Invertor.R
+import com.build.Invertor.databinding.CardTechLayoutBinding
 import com.build.invertor.mainModule.application.App
+import com.build.invertor.mainModule.application.appComponent
+import com.build.invertor.mainModule.viewModelFactory.DaggerViewModelFactory
 import com.build.invertor.model.modelOld.json.json.CardInventory
 import com.build.invertor.model.modelOld.json.csv.NewUser
 import com.google.android.material.textfield.TextInputEditText
@@ -46,17 +51,21 @@ class CardFragmentNew : Fragment() {
     private lateinit var inventNumber : TextView
     private lateinit var controller : CardFragmentController
 
-    private val listSpin = listOf<String>("","В эксплуатации","Требуется ремонт","Находится на консервации",
-        "Не соответствует требованиям эксплуатации","Не введен в эксплуатацию","Списание","Утилизация")
+    @Inject
+    lateinit var factory : DaggerViewModelFactory
+
+    private val viewModel : CardViewModel by viewModels { factory }
+
+    private val binding : CardTechLayoutBinding by lazy { CardTechLayoutBinding.inflate(layoutInflater) }
 
     private val sound : MediaPlayer by lazy {(MediaPlayer.create(requireContext(),R.raw.scanner_beep))}
 
     private var user : NewUser? = null
-    private var card : CardInventory? =  null
+    private var index : Int = -1
 
-    @Inject
-    fun injectController(cardFragmentController: CardFragmentController) {
-        this.controller = cardFragmentController
+    override fun onAttach(context: Context) {
+        context.appComponent.injectCardFragment(this)
+        super.onAttach(context)
     }
 
 
@@ -65,13 +74,13 @@ class CardFragmentNew : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        return inflater.inflate(R.layout.card_tech_layout,container,false)
+        return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         user = this@CardFragmentNew.arguments?.getParcelable("user")
-        card = this@CardFragmentNew.arguments?.getParcelable("card")
+        index = this@CardFragmentNew.arguments?.getInt("cardIndex") ?: -1
 
         location = view.findViewById(R.id.adress)
         cardDescription = view.findViewById(R.id.description)
@@ -84,7 +93,7 @@ class CardFragmentNew : Fragment() {
         inventNumber = view.findViewById(R.id.invenNumb)
         serialNumberInputLayout = view.findViewById(R.id.serialNimberEditLayout)
         createDependencyButton = view.findViewById(R.id.dependencyButton)
-        statusSpinner.adapter = ArrayAdapter(requireContext(),R.layout.spinner,listSpin)
+        statusSpinner.adapter = ArrayAdapter(requireContext(),R.layout.spinner,viewModel.listSpin)
 
         //change to fun
         if(card?.Status != null) {
@@ -92,13 +101,21 @@ class CardFragmentNew : Fragment() {
         }else {
             statusSpinner.setDefaultStatus(listSpin,"В эксплуатации")
         }
+        location.text = card?.Adress
+
+        cardDescription.text = card?.UEDescription
+
+        oldUser.text = "Старый пользователь : ${card?.UserName?.substringAfter("|")}"
+
+        userWidget.text = "Новый пользователь : ${user?.user?.userName}"
+
+        inventNumber.text = "Инвентарный номер : ${card?.inventNumb}"
 
 
         serialNumberEdit.setText(card?.SerialNumb)
 
         note.setText(card?.Description)
 
-        (requireActivity().application as App).dagger.injectCardFragment(this)
     }
 
     private fun Spinner.setDefaultStatus(listForSpinner : List<String>,status : String) {
@@ -119,19 +136,12 @@ class CardFragmentNew : Fragment() {
 
 
     override fun onStart() {
-        controller.apply {
-            setCard(this@CardFragmentNew.card!!)
-            setUser(this@CardFragmentNew.user!!)
-        }
         super.onStart()
+
         var itemSelected : String = ""
         checkCardAndUser()
+
         var max : Int = 0
-        location.text = card?.Adress
-        cardDescription.text = card?.UEDescription
-        oldUser.text = "Старый пользователь : ${card?.UserName?.substringAfter("|")}"
-        userWidget.text = "Новый пользователь : ${user?.user?.userName}"
-        inventNumber.text = "Инвентарный номер : ${card?.inventNumb}"
 
         createAlertDialogWithScanner()
 
@@ -175,6 +185,7 @@ class CardFragmentNew : Fragment() {
                     scopeScanner.pause()
                 }
             } }
+
             decoderFactory = DefaultDecoderFactory(listOf(
                 BarcodeFormat.CODE_93,
                 BarcodeFormat.CODE_128,

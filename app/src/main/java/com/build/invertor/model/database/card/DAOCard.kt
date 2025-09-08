@@ -27,4 +27,10 @@ interface DAOCard {
 
     @Update
     suspend fun updateCard(cardEntity: CardEntity)
+
+    @Query("SELECT * FROM Card WHERE InventNumb = :string OR Code1C = :string")
+    suspend fun selectCardByString(string : String) : List<CardEntity>
+
+    @Query("SELECT InventNumb , Code1C FROM Card")
+    suspend fun selectCodes() : List<Codes>
 }

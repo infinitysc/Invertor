@@ -20,6 +20,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import com.build.Invertor.R
 import com.build.invertor.mainModule.application.App
+import com.build.invertor.mainModule.application.appComponent
 import com.build.invertor.mainModule.viewModelFactory.DaggerViewModelFactory
 import java.io.*
 import javax.inject.Inject
@@ -30,10 +31,12 @@ class LoaderFragment : Fragment() {
     private lateinit var exportButton : Button
     private lateinit var importExcelButton : Button
 
-
     private var selectedExcelFileUri : Uri? = null
     private var saveFileName: String? = null
     private var selectedJsonFileUri: Uri? = null
+
+
+
 
     @Inject
     lateinit var factory : DaggerViewModelFactory
@@ -41,7 +44,7 @@ class LoaderFragment : Fragment() {
     private val viewModel: LoaderViewModel by viewModels { factory }
 
     override fun onAttach(context: Context) {
-        (requireActivity().application as App).dagger.injectLoaderFragment(this)
+        context.appComponent.injectLoaderFragment(this)
         super.onAttach(context)
     }
 
@@ -69,16 +72,12 @@ class LoaderFragment : Fragment() {
                 intentConfiguratorExcel()
             }
 
-            viewModel.loadFromFileExcel(File(requireContext().filesDir,"data.xlsx"))
-
         }
 
         importButton.setOnClickListener(){
             provideComplete {
                 launchJsonFilePicker()
             }
-
-            viewModel.loadFromFileJson(File(requireContext().filesDir,"jso.json"))
 
         }
 
@@ -93,6 +92,13 @@ class LoaderFragment : Fragment() {
                 }
             }
         }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+
+
+
     }
 
     private fun checkVersion() : Boolean{
@@ -165,7 +171,7 @@ class LoaderFragment : Fragment() {
                 input?.close()
             }
 
-        //ConverterJson(inputStream!!,requireContext()) // TEST 26.07.25
+        viewModel.loadFromFileJson(File(requireContext().filesDir,"jso.json"))
 
         Toast.makeText(requireContext(),"Импорт файла успешно завершен",Toast.LENGTH_SHORT).show()
         Log.d("FileUtility", "JSON file copied to internal storage ")
@@ -261,6 +267,10 @@ class LoaderFragment : Fragment() {
                 input?.copyTo(output)
             }
         }
+
+
+        viewModel.loadFromFileExcel(File(requireContext().filesDir,"data.xlsx"))
+
 
         Toast.makeText(requireContext(),"Импорт файла успешно завершен",Toast.LENGTH_SHORT).show()
         Log.d("FileWork", "Excel файл скопирован во внутреннее хранилище $fileName")

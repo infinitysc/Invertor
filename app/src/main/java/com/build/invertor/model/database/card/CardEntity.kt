@@ -4,12 +4,13 @@ import androidx.room.ColumnInfo
 import androidx.room.Dao
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import com.build.invertor.model.modelOld.json.json.CardInventory
 
 
 @Entity(tableName = "Card")
 data class CardEntity (
 
-    @PrimaryKey(autoGenerate = false)
+    @PrimaryKey(autoGenerate = true)
     @ColumnInfo("id")
     val index : Int ,
     @ColumnInfo("SID")
@@ -40,7 +41,5 @@ data class CardEntity (
     var Cod1C : String?,
     @ColumnInfo("ParentEqueipment")
     var parentEqueipment : Int,
-
-
 
 )
