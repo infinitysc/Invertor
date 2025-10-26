@@ -40,7 +40,7 @@
     </fragment>
     <fragment
         android:id="@+id/babyCardFragment"
-        android:name="com.build.invertor.mainModule.Card.BabyCardFragment"
+        android:name="com.build.invertor.mainModule.oldFragments.BabyCardFragment"
         android:label="BabyCardFragment" />
     <fragment
         android:id="@+id/listChoiceFragment"

@@ -1,4 +1,4 @@
-package com.build.invertor.mainModule.Card
+package com.build.invertor.mainModule.oldFragments
 
 import android.Manifest
 import android.app.AlertDialog
@@ -298,12 +298,15 @@ class CardFragment : Fragment(){
                 }
             }
         }
+
+
         dependencyButton.setOnClickListener() {
             var change = 0
             oldSnNumber = serNumberEditor.text.toString()
             if(oldSnNumber != ""){
                 change = 1
             }
+
             // controller
             val papaCard = createEditedCard(
                 user = this.user!!,

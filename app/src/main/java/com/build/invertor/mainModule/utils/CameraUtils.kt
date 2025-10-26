@@ -11,13 +11,13 @@ import kotlinx.coroutines.launch
 
 object CameraUtils {
 
-    fun listCodesToListString(listCodes : List<Codes>) : List<String?> {
+    fun listCodesToListString(listCodes : List<Codes>) : List<String> {
 
-       val mutableList : MutableList<String?> = mutableListOf()
+       val mutableList : MutableList<String> = mutableListOf()
 
        listCodes.forEach { code ->
-           mutableList.add(code.Cod1C)
-           mutableList.add(code.inventNumb)
+           mutableList.add(code.Cod1C ?: "")
+           mutableList.add(code.inventNumb ?: "")
        }
 
        return mutableList

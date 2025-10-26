@@ -7,7 +7,10 @@ import com.build.invertor.model.database.card.Codes
 import com.build.invertor.model.database.card.DAOCard
 import com.build.invertor.model.database.data.DAOUser
 import com.build.invertor.model.database.data.UserEntity
+import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.withContext
@@ -15,10 +18,9 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 annotation class User()
-
 annotation class Card()
 
-
+//TODO: Разобраться с dispatcher IO
 @Singleton
 class Repository @Inject constructor(private val database : AppDataBase) {
 
@@ -56,6 +58,14 @@ class Repository @Inject constructor(private val database : AppDataBase) {
     suspend fun getAll() : List<CardEntity> {
         return withContext(Dispatchers.IO) {
            return@withContext daoCard.getAll()
+        }
+    }
+
+    suspend fun getAsyncAll() : Deferred<List<CardEntity>> {
+        return coroutineScope {
+            async(Dispatchers.IO) {
+                return@async daoCard.getAll()
+            }
         }
     }
 

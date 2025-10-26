@@ -13,7 +13,7 @@ import androidx.fragment.app.FragmentManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.build.Invertor.R
-import com.build.invertor.mainModule.Card.CardFragment
+import com.build.invertor.mainModule.oldFragments.CardFragment
 import com.build.invertor.mainModule.application.App
 import com.build.invertor.mainModule.application.appComponent
 import com.build.invertor.mainModule.listFragment.recycler.Adapter

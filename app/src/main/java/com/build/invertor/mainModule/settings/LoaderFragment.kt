@@ -22,6 +22,8 @@ import com.build.Invertor.R
 import com.build.invertor.mainModule.application.App
 import com.build.invertor.mainModule.application.appComponent
 import com.build.invertor.mainModule.viewModelFactory.DaggerViewModelFactory
+import com.build.invertor.model.database.data.UserEntity
+import com.build.invertor.model.modelOld.json.csv.DataDownloader
 import java.io.*
 import javax.inject.Inject
 
@@ -71,7 +73,6 @@ class LoaderFragment : Fragment() {
             provideComplete{
                 intentConfiguratorExcel()
             }
-
         }
 
         importButton.setOnClickListener(){
@@ -171,7 +172,7 @@ class LoaderFragment : Fragment() {
                 input?.close()
             }
 
-        viewModel.loadFromFileJson(File(requireContext().filesDir,"jso.json"))
+        viewModel.overLoad(File(requireContext().filesDir,"jso.json"),viewModel::createFromFileJsonList)
 
         Toast.makeText(requireContext(),"Импорт файла успешно завершен",Toast.LENGTH_SHORT).show()
         Log.d("FileUtility", "JSON file copied to internal storage ")
@@ -269,8 +270,8 @@ class LoaderFragment : Fragment() {
         }
 
 
-        viewModel.loadFromFileExcel(File(requireContext().filesDir,"data.xlsx"))
-
+        //viewModel.loadFromFileExcel(File(requireContext().filesDir,"data.xlsx"))
+        viewModel.overLoad(File(requireContext().filesDir,"data.xlsx"),viewModel::createFromFileExcelList)
 
         Toast.makeText(requireContext(),"Импорт файла успешно завершен",Toast.LENGTH_SHORT).show()
         Log.d("FileWork", "Excel файл скопирован во внутреннее хранилище $fileName")

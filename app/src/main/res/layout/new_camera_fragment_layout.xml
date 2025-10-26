@@ -97,6 +97,7 @@
         android:layout_width="392dp"
         android:layout_height="49dp"
         android:layout_marginTop="28dp"
+        android:visibility="visible"
         android:text="TEST_USER_CARD"
         app:layout_constraintEnd_toEndOf="@+id/switch_torch"
         app:layout_constraintHorizontal_bias="0.0"

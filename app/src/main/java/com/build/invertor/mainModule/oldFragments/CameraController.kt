@@ -1,11 +1,11 @@
-package com.build.invertor.mainModule.camera
+package com.build.invertor.mainModule.oldFragments
 
 import android.content.Context
 import android.util.Log
 import com.build.invertor.mainModule.AbstractController
+import com.build.invertor.mainModule.camera.StateCard
 import com.build.invertor.model.modelOld.json.json.CardInventory
 import com.google.gson.Gson
-import com.google.gson.GsonBuilder
 import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
@@ -45,7 +45,7 @@ class CameraController @Inject constructor(private val context : Context) : Abst
         if(cacheContainsFiles()){
             cacheDeleteFiles()
         }
-        val newCacheFile = File(context.cacheDir,"${userName}.json")
+        val newCacheFile = File(context.cacheDir, "${userName}.json")
         val jsonList = gson.toJson(card)
 
         try {
@@ -57,7 +57,7 @@ class CameraController @Inject constructor(private val context : Context) : Abst
 
     }
 
-    private fun writeCacheJsonToCacheDir(cacheFile : File,jsonList : String)  {
+    private fun writeCacheJsonToCacheDir(cacheFile : File, jsonList : String)  {
         FileOutputStream(cacheFile).use {
             it.write(jsonList.toByteArray())
             it.flush()
@@ -80,7 +80,7 @@ class CameraController @Inject constructor(private val context : Context) : Abst
         return false
     }
 
-    fun checkCard(card : List<CardInventory>) : StateCard{
+    fun checkCard(card : List<CardInventory>) : StateCard {
         return when {
             card.isEmpty() -> StateCard.EMPTY
             card.size == 1 -> StateCard.ONE_ELEMENT

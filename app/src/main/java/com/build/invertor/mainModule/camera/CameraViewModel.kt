@@ -1,5 +1,6 @@
 package com.build.invertor.mainModule.camera
 
+import android.content.Context
 import android.util.Log
 import android.widget.ArrayAdapter
 import android.widget.AutoCompleteTextView
@@ -16,16 +17,19 @@ import com.build.invertor.model.database.card.CardEntity
 import com.build.invertor.model.database.card.Codes
 import com.build.invertor.model.modelOld.json.json.CardInventory
 import com.google.zxing.BarcodeFormat
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -42,7 +46,6 @@ class CameraViewModel @Inject constructor(private val repository: Repository) : 
         BarcodeFormat.EAN_8,
     )
 
-
     private val _valueString : MutableLiveData<String> = MutableLiveData("defaultValue")
     val valueString : LiveData<String> get() = _valueString
 
@@ -53,6 +56,7 @@ class CameraViewModel @Inject constructor(private val repository: Repository) : 
 
     private val _m : MutableStateFlow<List<CardEntity>> = MutableStateFlow(emptyList())
     val m : StateFlow<List<CardEntity>> get() = _m.asStateFlow()
+
     fun createFlowData(str : String) {
         viewModelScope.launch {
             _m.value = repository.selectByString(str)
@@ -62,7 +66,11 @@ class CameraViewModel @Inject constructor(private val repository: Repository) : 
 
     val flo = flow {
         emit(repository.getListCode())
-    }
+    }.stateIn(
+        viewModelScope,
+        SharingStarted.Eagerly,
+        emptyList()
+    )
 
     fun selectedByFlow(valueString : String) : Flow<List<CardEntity>> {
         return flow {
@@ -70,6 +78,34 @@ class CameraViewModel @Inject constructor(private val repository: Repository) : 
         }
     }
 
+
+    fun carde(listing : List<CardEntity>) : List<CardInventory> {
+        val m = mutableListOf<CardInventory>()
+        listing.forEach { it ->
+            m.add(it.toCardInventory())
+        }
+        return m
+    }
+
+    private fun CardEntity.toCardInventory() : CardInventory {
+        return CardInventory(
+            index = this.index,
+            SID = this.SID ,
+            UEID = this.UEID,
+            UEDescription = this.UEDescription,
+            ActionDateTime = this.ActionDateTime,
+            Adress = this.Adress,
+            Status = this.Status,
+            inventNumb = this.inventNumb,
+            SerialNumb =this.SerialNumb,
+            IsSNEdited = this.IsSNEdited,
+            UserName = this.UserName,
+            Description = this.Description ,
+            Cabinet = this.Cabinet,
+            Cod1C = this.Cod1C,
+            parentEqueipment = this.parentEqueipment,
+        )
+    }
 
 
     fun checkCard(card : List<CardEntity>) : StateCard{

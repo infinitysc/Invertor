@@ -13,17 +13,18 @@ import android.widget.AdapterView.OnItemSelectedListener
 import android.widget.ArrayAdapter
 import android.widget.Button
 import android.widget.Spinner
-import android.widget.TextView
+import android.widget.Toast
 import androidx.appcompat.widget.SwitchCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import com.build.Invertor.R
 import com.build.Invertor.databinding.CardTechLayoutBinding
-import com.build.invertor.mainModule.application.App
 import com.build.invertor.mainModule.application.appComponent
 import com.build.invertor.mainModule.viewModelFactory.DaggerViewModelFactory
-import com.build.invertor.model.modelOld.json.json.CardInventory
+import com.build.invertor.model.database.card.CardEntity
 import com.build.invertor.model.modelOld.json.csv.NewUser
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
@@ -31,43 +32,26 @@ import com.google.zxing.BarcodeFormat
 import com.journeyapps.barcodescanner.BarcodeCallback
 import com.journeyapps.barcodescanner.BarcodeView
 import com.journeyapps.barcodescanner.DefaultDecoderFactory
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 import kotlin.jvm.Throws
 
 class CardFragmentNew : Fragment() {
-
-    private lateinit var saveButton : Button
-    private lateinit var serialNumberInputLayout : TextInputLayout
-    private lateinit var location : TextView
-    private lateinit var serialNumberEdit : TextInputEditText
-    private lateinit var statusSpinner : Spinner
-    private lateinit var userWidget : TextView
-    private lateinit var cardDescription : TextView
-    private lateinit var note : TextInputEditText
-    private lateinit var createDependencyButton : Button
-    private lateinit var oldUser : TextView
-    private lateinit var inventNumber : TextView
-    private lateinit var controller : CardFragmentController
-
     @Inject
     lateinit var factory : DaggerViewModelFactory
 
+    private val alertWithScanner : AlertDialog by lazy { createAlertDialogWithScanner() }
     private val viewModel : CardViewModel by viewModels { factory }
-
     private val binding : CardTechLayoutBinding by lazy { CardTechLayoutBinding.inflate(layoutInflater) }
-
     private val sound : MediaPlayer by lazy {(MediaPlayer.create(requireContext(),R.raw.scanner_beep))}
-
     private var user : NewUser? = null
     private var index : Int = -1
+    private var card : CardEntity? = null
 
     override fun onAttach(context: Context) {
         context.appComponent.injectCardFragment(this)
         super.onAttach(context)
     }
-
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -79,42 +63,48 @@ class CardFragmentNew : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
         user = this@CardFragmentNew.arguments?.getParcelable("user")
         index = this@CardFragmentNew.arguments?.getInt("cardIndex") ?: -1
 
-        location = view.findViewById(R.id.adress)
-        cardDescription = view.findViewById(R.id.description)
-        serialNumberEdit = view.findViewById(R.id.serialNumberEdit)
-        statusSpinner = view.findViewById(R.id.spinnerStatus)
-        userWidget = view.findViewById(R.id.user)
-        note = view.findViewById(R.id.note)
-        saveButton = view.findViewById(R.id.saveButton)
-        oldUser = view.findViewById(R.id.oldUser)
-        inventNumber = view.findViewById(R.id.invenNumb)
-        serialNumberInputLayout = view.findViewById(R.id.serialNimberEditLayout)
-        createDependencyButton = view.findViewById(R.id.dependencyButton)
-        statusSpinner.adapter = ArrayAdapter(requireContext(),R.layout.spinner,viewModel.listSpin)
-
-        //change to fun
-        if(card?.Status != null) {
-            statusSpinner.setDefaultStatus(listSpin, card!!.Status!!)
-        }else {
-            statusSpinner.setDefaultStatus(listSpin,"В эксплуатации")
+        if(index == -1 ) {
+            requireActivity().supportFragmentManager.popBackStack()
         }
-        location.text = card?.Adress
 
-        cardDescription.text = card?.UEDescription
+        binding.spinnerStatus.adapter = ArrayAdapter(requireContext(),R.layout.spinner,viewModel.listSpin)
 
-        oldUser.text = "Старый пользователь : ${card?.UserName?.substringAfter("|")}"
+        lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.CREATED){
+                viewModel.getFlow(index).collect {
+                    card = it
 
-        userWidget.text = "Новый пользователь : ${user?.user?.userName}"
+                    if(card?.Status != null) {
+                        binding.spinnerStatus.setDefaultStatus(viewModel.listSpin, card!!.Status!!)
+                    }else {
+                        binding.spinnerStatus.setDefaultStatus(viewModel.listSpin,"В эксплуатации")
+                    }
 
-        inventNumber.text = "Инвентарный номер : ${card?.inventNumb}"
+                    binding.adress.text = card?.Adress
 
+                    binding.description.text = card?.UEDescription
 
-        serialNumberEdit.setText(card?.SerialNumb)
+                    //getString(Resource str, arg)
+                    binding.oldUser.text = "Старый пользователь : ${card?.UserName?.substringAfter("|")}"
 
-        note.setText(card?.Description)
+                    binding.user.text = "Новый пользователь : ${user?.user?.userName}"
+
+                    binding.invenNumb.text = "Инвентарный номер : ${card?.inventNumb}"
+
+                    binding.serialNumberEdit.setText(card?.SerialNumb)
+
+                    binding.note.setText(card?.Description)
+                }
+            }
+        }
+
+        binding.serialNimberEditLayout.setEndIconOnClickListener {
+            alertWithScanner.show()
+        }
 
     }
 
@@ -132,41 +122,60 @@ class CardFragmentNew : Fragment() {
         }
     }
 
-
-
-
     override fun onStart() {
         super.onStart()
 
         var itemSelected : String = ""
-        checkCardAndUser()
-
         var max : Int = 0
 
-        createAlertDialogWithScanner()
-
-        statusSpinner.onItemSelectedListener = object : OnItemSelectedListener {
+        binding.spinnerStatus.onItemSelectedListener = object : OnItemSelectedListener {
             override fun onItemSelected(
                 parent: AdapterView<*>?,
                 view: View?,
                 position: Int,
                 id: Long
             ) {
-                itemSelected = listSpin[position]
+                itemSelected = viewModel.listSpin[position]
             }
-
             override fun onNothingSelected(parent: AdapterView<*>?) {
             }
         }
 
-        //IO
-        saveButton.setOnClickListener {
-            lifecycleScope.launch(Dispatchers.IO) {
-                max = controller.getMax()
+        binding.saveButton.setOnClickListener {
+            checkCardAndUser()
+
+            card?.let { it ->
+                val newCard = CardEntity(
+                    index = it.index,
+                    SID = it.SID,
+                    UEID = it.UEID,
+                    UEDescription = it.UEDescription,
+                    ActionDateTime = viewModel.getCurrentTime(),
+                    Adress = user?.adress,
+                    Status = binding.status.text.toString(),
+                    inventNumb = it.inventNumb,
+                    SerialNumb = binding.serialNumberEdit.text.toString(),
+                    IsSNEdited = checkChangeSerialNumber(),
+                    UserName = "${user?.user?.id}|${user?.user?.userName}",
+                    Description = if(binding.note.text.toString() == ""){null} else {binding.note.text.toString()},
+                    Cabinet = user?.cabinet,
+                    Cod1C = it.Cod1C,
+                    parentEqueipment =it.parentEqueipment,)
+                viewModel.updateCard(newCard)
             }
             requireActivity().supportFragmentManager.popBackStack()
         }
+        binding.dependencyButton.setOnClickListener {
+            checkCardAndUser()
 
+            createAlertChildCardDialog().show()
+        }
+
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        sound.release()
     }
 
     private fun createAlertDialogWithScanner() : AlertDialog {
@@ -216,7 +225,7 @@ class CardFragmentNew : Fragment() {
             .setCancelable(true)
             .setPositiveButton("ок"){dialog, which ->
                 if(value != ""){
-                    serialNumberEdit.setText(value)
+                    binding.serialNumberEdit.setText(value)
                 }
                 dialog.dismiss()
             }
@@ -226,6 +235,78 @@ class CardFragmentNew : Fragment() {
             .create()
     }
 
+    private fun createAlertChildCardDialog() : AlertDialog {
+
+        var spinPos : String = ""
+
+        val dialogView = LayoutInflater.from(requireContext()).inflate(R.layout.baby_card_layout,null)
+        val description = dialogView.findViewById<TextInputEditText>(R.id.opi)
+        val serialNumber = dialogView.findViewById<TextInputEditText>(R.id.ser)
+        //val tap = dialogView.findViewById<Button>(R.id.tapButton)
+        val note = dialogView.findViewById<TextInputEditText>(R.id.desc)
+        val input = dialogView.findViewById<TextInputLayout>(R.id.testL)
+        val spinner = dialogView.findViewById<Spinner>(R.id.spinn)
+
+        spinner.adapter = ArrayAdapter(requireContext(), R.layout.spinner, viewModel.listSpin)
+        spinner.setSelection(viewModel.listSpin.indexOf("В эксплуатации"))
+
+        input.setEndIconOnClickListener {
+            alertWithScanner.show()
+        }
+        spinner.onItemSelectedListener = object : OnItemSelectedListener {
+            override fun onItemSelected(
+                parent: AdapterView<*>?,
+                view: View?,
+                position: Int,
+                id: Long
+            ) {
+                spinPos = viewModel.listSpin[position]
+            }
+
+            override fun onNothingSelected(parent: AdapterView<*>?) {
+
+            }
+        }
+
+        fun createNewCard(card : CardEntity?,user : NewUser?) : CardEntity{
+            return CardEntity(
+                index = 0,
+                SID =  card?.SID!!,
+                UEID = null ,
+                UEDescription = if(description.text.toString() == ""){null}else {description.text.toString()},
+                ActionDateTime = viewModel.getCurrentTime(),
+                Adress = card.Adress,
+                Status = spinPos,
+                inventNumb = card.inventNumb,
+                SerialNumb = if(serialNumber.text.toString() == ""){null}else{serialNumber.text.toString()},
+                IsSNEdited = checkChangeSerialNumber(serialNumber),
+                UserName = "${user?.user?.id}|${user?.user?.userName}",
+                Description = if(note.text.toString() == ""){null}else{note.text.toString()},
+                Cabinet = user?.cabinet,
+                Cod1C = card.Cod1C,
+                parentEqueipment = card.UEID ?: 0
+            )
+        }
+
+        return AlertDialog.Builder(requireContext())
+            .setView(dialogView)
+            .setCancelable(true)
+            .setPositiveButton("ok"){dialog, which ->
+                val newCard = createNewCard(card,user)
+                viewModel.addToDbNewCard(newCard)
+                dialog.dismiss()
+            }
+            .setNegativeButton("отмена") {dialog, which ->
+                dialog.dismiss()
+            }
+            .create()
+    }
+
+    private fun checkChangeSerialNumber(serialNumber : TextInputEditText = binding.serialNumberEdit) : Int {
+        return if(serialNumber.text.toString() != ""){
+            1
+        } else 0
+    }
 
 
     companion object {

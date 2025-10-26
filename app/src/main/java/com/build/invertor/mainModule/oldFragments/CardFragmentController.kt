@@ -1,9 +1,8 @@
-package com.build.invertor.mainModule.Card
+package com.build.invertor.mainModule.oldFragments
 
 import android.content.Context
-import android.view.View
-import com.build.invertor.model.modelOld.json.json.CardInventory
 import com.build.invertor.model.modelOld.json.csv.NewUser
+import com.build.invertor.model.modelOld.json.json.CardInventory
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import kotlinx.coroutines.Dispatchers
@@ -17,9 +16,7 @@ import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import javax.inject.Inject
 import javax.inject.Named
-import kotlin.Int
 import kotlin.collections.iterator
-import kotlin.math.PI
 
 class CardFragmentController @Inject constructor(
     private val context : Context,
@@ -41,13 +38,13 @@ class CardFragmentController @Inject constructor(
 
 
     suspend fun getMax() : Int {
-        return withContext(Dispatchers.IO) {File(cacheDir,"max.txt").readText().toInt()}
+        return withContext(Dispatchers.IO) { File(cacheDir, "max.txt").readText().toInt() }
     }
 
     suspend fun updateMax(maximumID : Int) {
         coroutineScope {
             launch(Dispatchers.IO) {
-                FileWriter(File(cacheDir,"max.txt")).use {
+                FileWriter(File(cacheDir, "max.txt")).use {
                     it.write((maximumID))
                     it.flush()
                 }
@@ -58,7 +55,7 @@ class CardFragmentController @Inject constructor(
     suspend fun saveDataFile(newCard : CardInventory,) {
 
         val fileName = "jso.json"
-        val file = File(this@CardFragmentController.context.filesDir,fileName)
+        val file = File(this@CardFragmentController.context.filesDir, fileName)
         val type = object : TypeToken<List<CardInventory>>() {}.type
         val work  = if(file.exists()){
             this@CardFragmentController.gson.fromJson<List<CardInventory>>(file.readText(),type)
@@ -72,7 +69,7 @@ class CardFragmentController @Inject constructor(
 
         val updatedJsonString = this@CardFragmentController.gson.toJson(work)
         try {
-            this@CardFragmentController.context.openFileOutput(fileName,Context.MODE_PRIVATE).use {
+            this@CardFragmentController.context.openFileOutput(fileName, Context.MODE_PRIVATE).use {
                 it.write(updatedJsonString.toByteArray())
                 it.flush()
             }
@@ -85,7 +82,7 @@ class CardFragmentController @Inject constructor(
 
     suspend fun getCacheFileToReWrite(fileNameFromCache : String,card : CardInventory) {
 
-        val file = File(this.context.cacheDir,fileNameFromCache)
+        val file = File(this.context.cacheDir, fileNameFromCache)
         if(file.exists()) {
             val type = object : TypeToken<List<CardInventory>>() {}.type
             val listData = this.gson.fromJson<List<CardInventory>>(file.readText(),type)
@@ -128,22 +125,26 @@ class CardFragmentController @Inject constructor(
 
         if(card != null && user != null){
             return CardInventory(
-                index = card!!.index ,
-                SID = card!!.SID ,
+                index = card!!.index,
+                SID = card!!.SID,
                 UEID = card!!.UEID,
                 UEDescription = card!!.UEDescription,
                 ActionDateTime = date,
                 Adress = adress,
                 Status = staus,
                 inventNumb = card!!.inventNumb,
-                SerialNumb =newSerialNumber,
+                SerialNumb = newSerialNumber,
                 IsSNEdited = change,
                 UserName = "${user!!.user?.id}|${user!!.user?.userName}",
-                Description = if(note == ""){null}else{note} ,
+                Description = if (note == "") {
+                    null
+                } else {
+                    note
+                },
                 Cabinet = cabinet,
                 Cod1C = card!!.Cod1C,
                 parentEqueipment = card!!.parentEqueipment,
-                )
+            )
         }
         else {
             throw NullPointerException("card or user is not initialize")

@@ -8,14 +8,19 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.AutoCompleteTextView
 import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageView
+import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.widget.SwitchCompat
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.Layout
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
@@ -29,6 +34,7 @@ import com.build.invertor.mainModule.Card.CardFragmentNew
 import com.build.invertor.mainModule.application.App
 import com.build.invertor.mainModule.application.appComponent
 import com.build.invertor.mainModule.listFragment.ListChoiceFragment
+import com.build.invertor.mainModule.oldFragments.CameraController
 import com.build.invertor.mainModule.utils.CameraUtils
 import com.build.invertor.mainModule.viewModelFactory.DaggerViewModelFactory
 import com.build.invertor.model.database.card.CardEntity
@@ -53,10 +59,13 @@ class CameraFragmentNew : Fragment(){
         NewCameraFragmentLayoutBinding.inflate(layoutInflater)
     }
 
-    private var codes : List<String?> = emptyList()
+    private var codes : List<String> = emptyList()
+
 
     @Inject
     lateinit var factory : DaggerViewModelFactory
+
+    private val alertDialog : AlertDialog by lazy { alertDialogCreator() }
 
     private val viewModel : CameraViewModel by viewModels { factory }
 
@@ -107,6 +116,7 @@ class CameraFragmentNew : Fragment(){
             }
         }
 
+        Log.i("CODES","$codes")
         viewModel.valueString.observe(viewLifecycleOwner) {
             if(it != "" || it != "defaultValue") {
                 viewModel.createFlowData(it)
@@ -122,6 +132,7 @@ class CameraFragmentNew : Fragment(){
             }
         }
 
+
         binding.userValue.text = user!!.user?.userName
         binding.barcodeView.decoderFactory = DefaultDecoderFactory(viewModel.formats)
         binding.barcodeView.decodeContinuous(callback)
@@ -132,29 +143,7 @@ class CameraFragmentNew : Fragment(){
         super.onStart()
 
         binding.value.setOnClickListener {
-            val alert = AlertDialog.Builder(requireContext())
-            alert.setTitle("Редактирование текста")
-
-            val array = ArrayAdapter(requireContext(),R.layout.spinner,codes)
-            val autocom = AutoCompleteTextView(requireContext())
-            autocom.setAdapter(array)
-
-            //что тут делал editText??
-
-            Log.i("CODE","$codes")
-
-            alert.setView(autocom)
-            alert.setPositiveButton("OK") { dialog, which ->
-                binding.value.setText(autocom.text.toString())
-                valueString = autocom.text.toString()
-                viewModel.setNewValueTo(autocom.text.toString())
-                dialog.dismiss()
-            }
-            alert.setNegativeButton("Отмена") { dialog,which->
-                dialog.dismiss()
-            }
-            val dialog = alert.create()
-            dialog.show()
+            alertDialog.show()
         }
 
         binding.barcodeView.resume()
@@ -177,6 +166,7 @@ class CameraFragmentNew : Fragment(){
 
         }
 
+
         Log.i("CODE","$codes")
         binding.buttonToNextFragment.setOnClickListener {
             if(list.isNotEmpty()) {
@@ -190,7 +180,7 @@ class CameraFragmentNew : Fragment(){
     }
 
     private fun startCardFragment(card : List<CardEntity>) {
-
+        Log.d("NEXT","$card, $user")
         val bundle = createBundle(this.user!!,card[0].index)
         requireActivity().supportFragmentManager.beginTransaction()
             .replace(R.id.mainFrameLayout, CardFragmentNew.newInstance(bundle))
@@ -199,7 +189,7 @@ class CameraFragmentNew : Fragment(){
     }
 
     private fun startListFragment(card : List<CardEntity>) {
-        controller.cacheSaver(carde(card), user?.user?.userName ?: "USER IS NULLABLE".apply {
+        controller.cacheSaver(viewModel.carde(card), user?.user?.userName ?: "USER IS NULLABLE".apply {
             useToast("ПОЛЬЗОВАТЕЛЬ ПУСТОЙ !!")
         })
         val bundle = Bundle()
@@ -210,7 +200,7 @@ class CameraFragmentNew : Fragment(){
         }
         requireActivity().supportFragmentManager.beginTransaction()
             .replace(R.id.mainFrameLayout, ListChoiceFragment.newInstance(
-                carde(card),
+                viewModel.carde(card),
                 this.user!!,
                 bundle
             ))
@@ -219,34 +209,28 @@ class CameraFragmentNew : Fragment(){
 
     }
 
-    fun carde(listing : List<CardEntity>) : List<CardInventory> {
+    private fun alertDialogCreator() : AlertDialog {
 
-        val m = mutableListOf<CardInventory>()
-        listing.forEach { it ->
-            m.add(it.toCardInventory())
-        }
-        return m
+        val layout = LayoutInflater.from(requireContext()).inflate(R.layout.alert_dialog_edit_value,null)
+        val array = ArrayAdapter(requireContext(),R.layout.spinner,codes)
+        val auto = layout.findViewById<AutoCompleteTextView>(R.id.alertAutoCompleteTextView)
+        auto.setAdapter(array)
+        Log.i("CODE","$codes")
+        return AlertDialog.Builder(requireContext())
+            .setTitle("Редактирование значения")
+            .setView(layout)
+            .setPositiveButton("ОК") {dialog, _ ->
+                binding.value.setText(auto.text.toString())
+                valueString = auto.text.toString()
+                viewModel.setNewValueTo(auto.text.toString())
+                dialog.dismiss()
+            }
+            .setNegativeButton("Отмена"){dialog, _ ->
+                dialog.dismiss()
+            }
+            .create()
     }
 
-    fun CardEntity.toCardInventory() : CardInventory {
-        return CardInventory(
-            index = this.index,
-            SID = this.SID ,
-            UEID = this.UEID,
-            UEDescription = this.UEDescription,
-            ActionDateTime = this.ActionDateTime,
-            Adress = this.Adress,
-            Status = this.Status,
-            inventNumb = this.inventNumb,
-            SerialNumb =this.SerialNumb,
-            IsSNEdited = this.IsSNEdited,
-            UserName = this.UserName,
-            Description = this.Description ,
-            Cabinet = this.Cabinet,
-            Cod1C = this.Cod1C,
-            parentEqueipment = this.parentEqueipment,
-        )
-    }
     private fun createBundle(user : NewUser,cardIndex : Int) : Bundle {
         return Bundle().apply {
             putParcelable("user",user)
@@ -265,4 +249,5 @@ class CameraFragmentNew : Fragment(){
             return  fragment
         }
     }
+
 }
