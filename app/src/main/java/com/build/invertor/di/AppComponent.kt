@@ -13,10 +13,10 @@ import dagger.BindsInstance
 import dagger.Component
 import javax.inject.Singleton
 
+@Singleton
 @Component(
     modules = [FileCreator::class,GsonClass::class, ViewModelModule::class, DataBaseCreator::class]
 )
-@Singleton
 interface AppComponent {
 
     fun injectDatabase(app : Application)

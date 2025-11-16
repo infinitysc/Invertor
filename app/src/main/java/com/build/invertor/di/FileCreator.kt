@@ -1,7 +1,6 @@
 package com.build.invertor.di
 
 import android.content.Context
-import com.build.invertor.mainModule.DataControl
 import dagger.Module
 import dagger.Provides
 import java.io.File
@@ -25,11 +24,6 @@ object FileCreator {
         return context.cacheDir
     }
 
-    @Provides
-    @Singleton
-    fun createDataControl() : DataControl {
-        return DataControl()
-    }
 
     @Provides
     @Named("Json")
