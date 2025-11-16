@@ -14,4 +14,17 @@ class ExampleUnitTest {
     fun addition_isCorrect() {
         assertEquals(4, 2 + 2)
     }
+
+
+    @Test
+    fun testFlow() {
+        val neededData = listOf<Int>(1,5,6,10)
+        val testData = listOf<Int>(1,2,3,4,5,6,7,8,9,10)
+
+
+    }
+
+
+
 }
+

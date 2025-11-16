@@ -33,7 +33,8 @@ import com.build.Invertor.databinding.NewCameraFragmentLayoutBinding
 import com.build.invertor.mainModule.Card.CardFragmentNew
 import com.build.invertor.mainModule.application.App
 import com.build.invertor.mainModule.application.appComponent
-import com.build.invertor.mainModule.listFragment.ListChoiceFragment
+import com.build.invertor.mainModule.oldFragments.ListChoiceFragment
+import com.build.invertor.mainModule.listFragment.ListFragmentNew
 import com.build.invertor.mainModule.oldFragments.CameraController
 import com.build.invertor.mainModule.utils.CameraUtils
 import com.build.invertor.mainModule.viewModelFactory.DaggerViewModelFactory
@@ -189,21 +190,23 @@ class CameraFragmentNew : Fragment(){
     }
 
     private fun startListFragment(card : List<CardEntity>) {
-        controller.cacheSaver(viewModel.carde(card), user?.user?.userName ?: "USER IS NULLABLE".apply {
-            useToast("ПОЛЬЗОВАТЕЛЬ ПУСТОЙ !!")
-        })
+        val newIndexList : () -> List<Int> = {
+            val list = mutableListOf<Int>()
+            card.forEach {
+                list.add(it.index)
+            }
+            list
+        }
+
         val bundle = Bundle()
-        bundle.putString("json","${user?.user?.userName}.json")
+        bundle.putParcelable("user",user)
+        bundle.putIntArray("indexArray",newIndexList.invoke().toIntArray())
         useToast("Обьектов найдено ${card.size}")
         runBlocking {
             delay(1000)
         }
         requireActivity().supportFragmentManager.beginTransaction()
-            .replace(R.id.mainFrameLayout, ListChoiceFragment.newInstance(
-                viewModel.carde(card),
-                this.user!!,
-                bundle
-            ))
+            .replace(R.id.mainFrameLayout, ListFragmentNew.newInstance(bundle))
             .addToBackStack("camera")
             .commit()
 

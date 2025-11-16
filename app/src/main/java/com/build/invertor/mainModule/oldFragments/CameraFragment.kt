@@ -19,7 +19,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import com.build.Invertor.R
 import com.build.invertor.mainModule.oldFragments.CardFragment
-import com.build.invertor.mainModule.listFragment.ListChoiceFragment
+import com.build.invertor.mainModule.oldFragments.ListChoiceFragment
 import com.build.invertor.model.modelOld.json.csv.NewUser
 import com.build.invertor.model.modelOld.json.json.CardInventory
 import com.build.invertor.model.modelOld.json.json.JsonDownloader

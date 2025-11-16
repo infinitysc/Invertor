@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.build.invertor.mainModule.Card.CardViewModel
 import com.build.invertor.mainModule.camera.CameraViewModel
+import com.build.invertor.mainModule.listFragment.ListFragmentViewModel
 import com.build.invertor.mainModule.settings.LoaderViewModel
 import com.build.invertor.mainModule.start.StartViewModel
 import com.build.invertor.mainModule.viewModelFactory.DaggerViewModelFactory
@@ -14,6 +15,11 @@ import dagger.multibindings.IntoMap
 
 @Module
 interface ViewModelModule {
+
+    @Binds
+    @IntoMap
+    @ViewModelKey(value = ListFragmentViewModel::class)
+    fun bindListFragmentViewModel(listFragmentViewModel: ListFragmentViewModel) : ViewModel
 
 
     @Binds

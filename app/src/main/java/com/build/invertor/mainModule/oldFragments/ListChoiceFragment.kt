@@ -1,4 +1,4 @@
-package com.build.invertor.mainModule.listFragment
+package com.build.invertor.mainModule.oldFragments
 
 import android.content.Context
 import android.os.Bundle
@@ -13,16 +13,15 @@ import androidx.fragment.app.FragmentManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.build.Invertor.R
-import com.build.invertor.mainModule.oldFragments.CardFragment
-import com.build.invertor.mainModule.application.App
-import com.build.invertor.mainModule.application.appComponent
 import com.build.invertor.mainModule.listFragment.recycler.Adapter
 import com.build.invertor.model.modelOld.json.csv.NewUser
 import com.build.invertor.model.modelOld.json.json.CardInventory
 import com.google.gson.GsonBuilder
 import com.google.gson.reflect.TypeToken
 import java.io.File
+import java.lang.IllegalStateException
 import javax.inject.Inject
+import kotlin.io.readText
 
 class ListChoiceFragment : Fragment() {
 
@@ -59,7 +58,6 @@ class ListChoiceFragment : Fragment() {
     }
 
     override fun onAttach(context: Context) {
-        context.appComponent.injectListFragment(this)
         super.onAttach(context)
     }
 
@@ -79,7 +77,7 @@ class ListChoiceFragment : Fragment() {
         try {
             fileName = this.requireArguments().getString("json").toString()
 
-        }catch (e : java.lang.IllegalStateException){
+        }catch (e : IllegalStateException){
             e.printStackTrace()
             Log.d("CacheFile","не удалось получить имя файла так как бандл пуст")
         }
@@ -89,26 +87,26 @@ class ListChoiceFragment : Fragment() {
         textCod1C.text = ("Код 1С : ${list?.get(0)?.Cod1C ?: ""}")
         recyclerView.layoutManager = LinearLayoutManager(requireContext())
         bundle.putString("json",fileName)
-        recyclerView.adapter = Adapter(this.list!!.toMutableList(),this.user!!) { card: CardInventory, user_: NewUser ->
+        /*recyclerView.adapter = Adapter(this.list!!.toMutableList(),this.user!!) { card: CardInventory, user_: NewUser ->
             manager?.beginTransaction()
                 ?.replace(R.id.mainFrameLayout, CardFragment.newInstance(user_,card,bundle))
                 ?.addToBackStack("list")
                 ?.commit()
-        }
+        }*/
     }
 
     override fun onStart() {
         super.onStart()
 
         //??
-        if (flag) {
+       /* if (flag) {
             newList = updateDataFromCache(fileName)
             flag = false
             val adapter = recyclerView.adapter as Adapter
             adapter.updateData(newList!!)
-            Toast.makeText(requireContext(),"Адаптер успешно обновлен",Toast.LENGTH_LONG).show()
+            Toast.makeText(requireContext(),"Адаптер успешно обновлен", Toast.LENGTH_LONG).show()
             Log.d("CacheFile","newList is updated")
-        }
+        }*/
     }
 
     override fun onStop() {
@@ -138,7 +136,7 @@ class ListChoiceFragment : Fragment() {
     // controller
     private fun checkFile(fileName: String) : File? {
         val cache = requireContext().cacheDir
-        val file = File(cache,fileName)
+        val file = File(cache, fileName)
 
         return if(file.exists()){
             file
@@ -150,7 +148,7 @@ class ListChoiceFragment : Fragment() {
 
     override fun onDestroy() {
         super.onDestroy()
-        File(requireContext().cacheDir,fileName).delete()
+        File(requireContext().cacheDir, fileName).delete()
         Log.d("CacheFile","Файл уничтожен")
     }
 

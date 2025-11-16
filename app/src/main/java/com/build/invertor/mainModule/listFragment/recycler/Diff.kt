@@ -1,11 +1,12 @@
 package com.build.invertor.mainModule.listFragment.recycler
 
 import androidx.recyclerview.widget.DiffUtil
+import com.build.invertor.model.database.card.CardEntity
 import com.build.invertor.model.modelOld.json.json.CardInventory
 
 class Diff (
-    private val oldList : List<CardInventory>,
-    private val newList : List<CardInventory>
+    private val oldList : List<CardEntity>,
+    private val newList : List<CardEntity>
     ) : DiffUtil.Callback(){
     override fun getOldListSize(): Int {
         return oldList.size

@@ -44,7 +44,7 @@
         android:label="BabyCardFragment" />
     <fragment
         android:id="@+id/listChoiceFragment"
-        android:name="com.build.invertor.mainModule.listFragment.ListChoiceFragment"
+        android:name="com.build.invertor.mainModule.oldFragments.ListChoiceFragment"
         android:label="ListChoiceFragment" >
         <action
             android:id="@+id/action_listChoiceFragment_to_cardFragmentNew"

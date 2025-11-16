@@ -8,13 +8,14 @@ import android.widget.TextView
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.build.Invertor.R
+import com.build.invertor.model.database.card.CardEntity
 import com.build.invertor.model.modelOld.json.csv.NewUser
 import com.build.invertor.model.modelOld.json.json.CardInventory
 
 class Adapter(
-    private var list : MutableList<CardInventory>,
+    private var list : MutableList<CardEntity>,
     private val user : NewUser,
-    private val onClickText : (CardInventory, NewUser) -> Unit
+    private val onClickText : (CardEntity, NewUser) -> Unit
 ) : RecyclerView.Adapter<Adapter.ViewHolder>() {
 
     class ViewHolder(itemView : View) : RecyclerView.ViewHolder(itemView) {
@@ -25,7 +26,7 @@ class Adapter(
         val time : TextView = itemView.findViewById(R.id.time)
     }
 
-    fun updateData(newData : List<CardInventory>) {
+    fun updateData(newData : List<CardEntity>) {
 
         val diffCallback = Diff(list,newData)
         val diffResult = DiffUtil.calculateDiff(diffCallback)

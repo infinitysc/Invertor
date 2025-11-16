@@ -1,4 +1,4 @@
-package com.build.invertor.mainModule
+package com.build.invertor.mainModule.oldFragments
 
 import android.content.Context
 import com.build.invertor.model.modelOld.json.csv.DataDownloader
@@ -27,7 +27,7 @@ abstract class AbstractController(context : Context) {
     private fun searchDataOld() : DataDownloader? {
         val fileName = "data.xlsx"
         try {
-            val file = File(fileDir,fileName)
+            val file = File(fileDir, fileName)
             if(file.exists()){
                 return DataDownloader(file.inputStream())
             }else {
@@ -42,8 +42,13 @@ abstract class AbstractController(context : Context) {
         val fileName = "jso.json"
 
         try {
-            val file = File(fileDir,fileName)
-            return JsonDownloader(JsonFileOpener(file.inputStream(), gson = GsonBuilder().create())).apply {
+            val file = File(fileDir, fileName)
+            return JsonDownloader(
+                JsonFileOpener(
+                    file.inputStream(),
+                    gson = GsonBuilder().create()
+                )
+            ).apply {
                 this.updateIndexList()
                 this.updateListAfterIndexController(cacheDir,fileDir)
             }

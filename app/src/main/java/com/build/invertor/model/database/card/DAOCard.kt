@@ -33,4 +33,6 @@ interface DAOCard {
 
     @Query("SELECT InventNumb , Code1C FROM Card")
     suspend fun selectCodes() : List<Codes>
+
+
 }

@@ -2,7 +2,7 @@ package com.build.invertor.mainModule.oldFragments
 
 import android.content.Context
 import android.util.Log
-import com.build.invertor.mainModule.AbstractController
+import com.build.invertor.mainModule.oldFragments.AbstractController
 import com.build.invertor.model.modelOld.json.csv.DataDownloader
 import com.build.invertor.model.modelOld.json.csv.User
 import com.build.invertor.model.modelOld.json.json.JsonDownloader
