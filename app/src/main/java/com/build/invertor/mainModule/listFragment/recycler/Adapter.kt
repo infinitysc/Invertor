@@ -10,7 +10,6 @@ import androidx.recyclerview.widget.RecyclerView
 import com.build.Invertor.R
 import com.build.invertor.model.database.card.CardEntity
 import com.build.invertor.model.modelOld.json.csv.NewUser
-import com.build.invertor.model.modelOld.json.json.CardInventory
 
 class Adapter(
     private var list : MutableList<CardEntity>,
@@ -24,16 +23,9 @@ class Adapter(
         val invent : TextView = itemView.findViewById(R.id.choiceInvent)
         val textContinut : Button = itemView.findViewById(R.id.continue_button)
         val time : TextView = itemView.findViewById(R.id.time)
+
     }
 
-    fun updateData(newData : List<CardEntity>) {
-
-        val diffCallback = Diff(list,newData)
-        val diffResult = DiffUtil.calculateDiff(diffCallback)
-        list.clear()
-        list.addAll(newData)
-        diffResult.dispatchUpdatesTo(this)
-    }
     override fun getItemCount(): Int {
         return list.size
     }
@@ -44,6 +36,7 @@ class Adapter(
         holder.adress.text = list[position].Adress
         holder.description.text = list[position].UEDescription
         holder.invent.text = list[position].inventNumb
+
         holder.textContinut.setOnClickListener(){
             onClickText(list[position],user)
         }

@@ -2,7 +2,7 @@ package com.build.invertor.di
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import com.build.invertor.mainModule.Card.CardViewModel
+import com.build.invertor.mainModule.card.CardViewModel
 import com.build.invertor.mainModule.camera.CameraViewModel
 import com.build.invertor.mainModule.listFragment.ListFragmentViewModel
 import com.build.invertor.mainModule.settings.LoaderViewModel

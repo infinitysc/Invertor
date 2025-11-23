@@ -15,7 +15,6 @@ import com.build.invertor.mainModule.utils.CameraUtils
 import com.build.invertor.model.database.Repository
 import com.build.invertor.model.database.card.CardEntity
 import com.build.invertor.model.database.card.Codes
-import com.build.invertor.model.modelOld.json.json.CardInventory
 import com.google.zxing.BarcodeFormat
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Deferred
@@ -77,36 +76,6 @@ class CameraViewModel @Inject constructor(private val repository: Repository) : 
             emit(repository.selectByString(valueString))
         }
     }
-
-
-    fun carde(listing : List<CardEntity>) : List<CardInventory> {
-        val m = mutableListOf<CardInventory>()
-        listing.forEach { it ->
-            m.add(it.toCardInventory())
-        }
-        return m
-    }
-
-    private fun CardEntity.toCardInventory() : CardInventory {
-        return CardInventory(
-            index = this.index,
-            SID = this.SID ,
-            UEID = this.UEID,
-            UEDescription = this.UEDescription,
-            ActionDateTime = this.ActionDateTime,
-            Adress = this.Adress,
-            Status = this.Status,
-            inventNumb = this.inventNumb,
-            SerialNumb =this.SerialNumb,
-            IsSNEdited = this.IsSNEdited,
-            UserName = this.UserName,
-            Description = this.Description ,
-            Cabinet = this.Cabinet,
-            Cod1C = this.Cod1C,
-            parentEqueipment = this.parentEqueipment,
-        )
-    }
-
 
     fun checkCard(card : List<CardEntity>) : StateCard{
         return when {

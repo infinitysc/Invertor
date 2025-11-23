@@ -1,32 +1,22 @@
 package com.build.invertor.mainModule.application
 
 import android.app.Application
-import Debug.logCatLogger.LogCatSaver
 import android.content.Context
 import com.build.invertor.di.AppComponent
 import com.build.invertor.di.DaggerAppComponent
-import com.build.invertor.model.database.Repository
-
 import org.acra.BuildConfig
 import org.acra.config.dialog
 import org.acra.config.mailSender
 import org.acra.data.StringFormat
 import org.acra.ktx.initAcra
-import javax.inject.Inject
 
 class App : Application() {
 
     lateinit var appComponent: AppComponent
 
-    private lateinit var logCatSaver: LogCatSaver
-
-
-
     override fun onCreate() {
         super.onCreate()
         appComponent = DaggerAppComponent.factory().create(this)
-        logCatSaver = LogCatSaver(this)
-        logCatSaver.startLogging()
 
         initAcra {
             buildConfigClass = BuildConfig::class.java
@@ -54,7 +44,6 @@ class App : Application() {
 
     override fun onTerminate() {
         super.onTerminate()
-        logCatSaver.stopLogging()
     }
 
 }

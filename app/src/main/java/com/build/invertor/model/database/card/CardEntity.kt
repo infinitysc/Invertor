@@ -4,7 +4,6 @@ import androidx.room.ColumnInfo
 import androidx.room.Dao
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import com.build.invertor.model.modelOld.json.json.CardInventory
 
 
 @Entity(tableName = "Card")

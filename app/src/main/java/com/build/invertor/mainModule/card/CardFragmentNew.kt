@@ -1,7 +1,9 @@
-package com.build.invertor.mainModule.Card
+package com.build.invertor.mainModule.card
 
 import android.app.AlertDialog
 import android.content.Context
+import android.content.Context.MODE_PRIVATE
+import android.content.SharedPreferences
 import android.media.MediaPlayer
 import android.os.Bundle
 import android.util.Log
@@ -11,9 +13,7 @@ import android.view.ViewGroup
 import android.widget.AdapterView
 import android.widget.AdapterView.OnItemSelectedListener
 import android.widget.ArrayAdapter
-import android.widget.Button
 import android.widget.Spinner
-import android.widget.Toast
 import androidx.appcompat.widget.SwitchCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -37,6 +37,7 @@ import javax.inject.Inject
 import kotlin.jvm.Throws
 
 class CardFragmentNew : Fragment() {
+
     @Inject
     lateinit var factory : DaggerViewModelFactory
 
@@ -44,6 +45,7 @@ class CardFragmentNew : Fragment() {
     private val viewModel : CardViewModel by viewModels { factory }
     private val binding : CardTechLayoutBinding by lazy { CardTechLayoutBinding.inflate(layoutInflater) }
     private val sound : MediaPlayer by lazy {(MediaPlayer.create(requireContext(),R.raw.scanner_beep))}
+
     private var user : NewUser? = null
     private var index : Int = -1
     private var card : CardEntity? = null
@@ -126,7 +128,6 @@ class CardFragmentNew : Fragment() {
         super.onStart()
 
         var itemSelected : String = ""
-        var max : Int = 0
 
         binding.spinnerStatus.onItemSelectedListener = object : OnItemSelectedListener {
             override fun onItemSelected(
@@ -137,6 +138,7 @@ class CardFragmentNew : Fragment() {
             ) {
                 itemSelected = viewModel.listSpin[position]
             }
+
             override fun onNothingSelected(parent: AdapterView<*>?) {
             }
         }
@@ -145,29 +147,22 @@ class CardFragmentNew : Fragment() {
             checkCardAndUser()
 
             card?.let { it ->
-                val newCard = CardEntity(
-                    index = it.index,
-                    SID = it.SID,
-                    UEID = it.UEID,
-                    UEDescription = it.UEDescription,
-                    ActionDateTime = viewModel.getCurrentTime(),
-                    Adress = user?.adress,
-                    Status = binding.status.text.toString(),
-                    inventNumb = it.inventNumb,
-                    SerialNumb = binding.serialNumberEdit.text.toString(),
-                    IsSNEdited = checkChangeSerialNumber(),
-                    UserName = "${user?.user?.id}|${user?.user?.userName}",
-                    Description = if(binding.note.text.toString() == ""){null} else {binding.note.text.toString()},
-                    Cabinet = user?.cabinet,
-                    Cod1C = it.Cod1C,
-                    parentEqueipment =it.parentEqueipment,)
+
+                val newCard = viewModel.createNewCard(it,user, ElementsCard(
+                    descriptionUE = it.UEDescription ?: "",
+                    spinPos = itemSelected,
+                    serialNumber = binding.serialNumberEdit.text.toString(),
+                    description = binding.note.text.toString()
+                ))
+
                 viewModel.updateCard(newCard)
             }
+
             requireActivity().supportFragmentManager.popBackStack()
         }
+
         binding.dependencyButton.setOnClickListener {
             checkCardAndUser()
-
             createAlertChildCardDialog().show()
         }
 
@@ -194,20 +189,8 @@ class CardFragmentNew : Fragment() {
                     scopeScanner.pause()
                 }
             } }
-
-            decoderFactory = DefaultDecoderFactory(listOf(
-                BarcodeFormat.CODE_93,
-                BarcodeFormat.CODE_128,
-                BarcodeFormat.CODE_39,
-                BarcodeFormat.EAN_8,
-                BarcodeFormat.EAN_13,
-                BarcodeFormat.QR_CODE,
-                BarcodeFormat.ITF,
-                BarcodeFormat.UPC_EAN_EXTENSION,
-                BarcodeFormat.UPC_E,
-                BarcodeFormat.UPC_A,
-                BarcodeFormat.CODABAR
-            ))
+            //vm
+            decoderFactory = viewModel.decoderFactory
         }
 
         scopeScanner.resume()
@@ -242,7 +225,6 @@ class CardFragmentNew : Fragment() {
         val dialogView = LayoutInflater.from(requireContext()).inflate(R.layout.baby_card_layout,null)
         val description = dialogView.findViewById<TextInputEditText>(R.id.opi)
         val serialNumber = dialogView.findViewById<TextInputEditText>(R.id.ser)
-        //val tap = dialogView.findViewById<Button>(R.id.tapButton)
         val note = dialogView.findViewById<TextInputEditText>(R.id.desc)
         val input = dialogView.findViewById<TextInputLayout>(R.id.testL)
         val spinner = dialogView.findViewById<Spinner>(R.id.spinn)
@@ -268,31 +250,16 @@ class CardFragmentNew : Fragment() {
             }
         }
 
-        fun createNewCard(card : CardEntity?,user : NewUser?) : CardEntity{
-            return CardEntity(
-                index = 0,
-                SID =  card?.SID!!,
-                UEID = null ,
-                UEDescription = if(description.text.toString() == ""){null}else {description.text.toString()},
-                ActionDateTime = viewModel.getCurrentTime(),
-                Adress = card.Adress,
-                Status = spinPos,
-                inventNumb = card.inventNumb,
-                SerialNumb = if(serialNumber.text.toString() == ""){null}else{serialNumber.text.toString()},
-                IsSNEdited = checkChangeSerialNumber(serialNumber),
-                UserName = "${user?.user?.id}|${user?.user?.userName}",
-                Description = if(note.text.toString() == ""){null}else{note.text.toString()},
-                Cabinet = user?.cabinet,
-                Cod1C = card.Cod1C,
-                parentEqueipment = card.UEID ?: 0
-            )
-        }
-
         return AlertDialog.Builder(requireContext())
             .setView(dialogView)
             .setCancelable(true)
             .setPositiveButton("ok"){dialog, which ->
-                val newCard = createNewCard(card,user)
+                val newCard = viewModel.createNewCard(card,user, ElementsCard(
+                    descriptionUE = description.text.toString(),
+                    spinPos = spinPos,
+                    serialNumber = serialNumber.text.toString(),
+                    description =  note.text.toString()
+                ))
                 viewModel.addToDbNewCard(newCard)
                 dialog.dismiss()
             }
@@ -300,12 +267,6 @@ class CardFragmentNew : Fragment() {
                 dialog.dismiss()
             }
             .create()
-    }
-
-    private fun checkChangeSerialNumber(serialNumber : TextInputEditText = binding.serialNumberEdit) : Int {
-        return if(serialNumber.text.toString() != ""){
-            1
-        } else 0
     }
 
 

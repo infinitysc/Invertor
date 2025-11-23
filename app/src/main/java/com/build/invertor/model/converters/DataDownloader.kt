@@ -1,19 +1,20 @@
-package com.build.invertor.model.modelOld.json.csv
+package com.build.invertor.model.converters
 
-import android.content.Context
 import com.build.invertor.model.database.data.UserEntity
-import org.apache.poi.ss.usermodel.*
+import com.build.invertor.model.modelOld.json.csv.User
+import org.apache.poi.ss.usermodel.Cell
+import org.apache.poi.ss.usermodel.CellType
+import org.apache.poi.ss.usermodel.Sheet
+import org.apache.poi.ss.usermodel.Workbook
 import org.apache.poi.xssf.usermodel.XSSFWorkbook
-import org.jetbrains.annotations.TestOnly
-import java.io.File
-import java.io.FileWriter
 import java.io.InputStream
 import javax.inject.Inject
 import javax.inject.Named
+import kotlin.collections.iterator
 
-class DataDownloader @Inject constructor(
-    @Named("Excel") private val path : InputStream,
-) : DataExcel {
+class DataDownloader constructor(
+    private val path : InputStream,
+) {
 
 
     private val workBook : Workbook = XSSFWorkbook(path)
@@ -36,15 +37,17 @@ class DataDownloader @Inject constructor(
                 if(listEditedString.isNotEmpty()){
                     list.add(
                         User(
-                        listEditedString[0].toInt(),
-                        listEditedString[1],
-                        listEditedString[2])
+                            listEditedString[0].toInt(),
+                            listEditedString[1],
+                            listEditedString[2]
+                        )
                     )
                     listDb.add(
                         UserEntity(
                             listEditedString[0].toInt(),
                             listEditedString[1],
-                            listEditedString[2])
+                            listEditedString[2]
+                        )
                     )
                 }
             }
@@ -71,31 +74,11 @@ class DataDownloader @Inject constructor(
         }
     }
 
-    override fun getList() : List<User>?  {
-        return this.list.ifEmpty {
-            null
-        }
-    }
     fun getListDb() : List<UserEntity> {
         return this.listDb.ifEmpty {
             emptyList<UserEntity>()
         }
     }
 
-    override fun createLinkedMap() : Map<String, User> {
-        val tempMap = mutableMapOf<String, User>()
-        for(i in this.list.iterator()) {
-            tempMap[i.userName] = i
-        }
-        return tempMap
-    }
-
-    override fun createIdLinkedMap() : Map<String, User>{
-        val tempMap = mutableMapOf<String, User>()
-        for(i in this.list.iterator()){
-            tempMap[i.id.toString()] = i
-        }
-        return tempMap
-    }
 
 }

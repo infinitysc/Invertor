@@ -4,6 +4,7 @@ import android.os.Parcel
 import android.os.Parcelable
 
 
+@Suppress("INFERRED_TYPE_VARIABLE_INTO_POSSIBLE_EMPTY_INTERSECTION")
 data class NewUser(
     val user : User?,
     val cabinet : String,

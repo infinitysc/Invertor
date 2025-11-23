@@ -7,11 +7,11 @@
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerMama"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_marginTop="44dp"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginTop="5dp"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/cod1c" />
 
@@ -19,9 +19,10 @@
         android:id="@+id/cod1c"
         android:layout_width="340dp"
         android:layout_height="18dp"
-        android:layout_marginStart="32dp"
-        android:layout_marginTop="16dp"
+        android:layout_marginTop="44dp"
+        android:gravity="center"
         android:text="COD1C"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 </androidx.constraintlayout.widget.ConstraintLayout>

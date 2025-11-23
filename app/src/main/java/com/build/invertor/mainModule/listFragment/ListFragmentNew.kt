@@ -14,29 +14,25 @@ import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.build.Invertor.R
 import com.build.Invertor.databinding.RecyclerLayoutBinding
-import com.build.invertor.mainModule.Card.CardFragmentNew
+import com.build.invertor.mainModule.card.CardFragmentNew
 import com.build.invertor.mainModule.application.appComponent
 import com.build.invertor.mainModule.listFragment.recycler.Adapter
-import com.build.invertor.mainModule.oldFragments.CardFragment
 import com.build.invertor.mainModule.viewModelFactory.DaggerViewModelFactory
-import com.build.invertor.model.database.card.CardEntity
 import com.build.invertor.model.modelOld.json.csv.NewUser
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-class ListFragmentNew : Fragment() {
-
-
-    private val binding : RecyclerLayoutBinding by lazy { RecyclerLayoutBinding.inflate(layoutInflater) }
-
-    private var list : List<Int> = emptyList()
-    private var user : NewUser? = null
+class ListFragmentNew : Fragment(){
 
     @Inject
     lateinit var factory : DaggerViewModelFactory
 
-
+    private val binding : RecyclerLayoutBinding by lazy { RecyclerLayoutBinding.inflate(layoutInflater) }
     private val viewModel : ListFragmentViewModel by viewModels {factory}
+
+    private var list : List<Int> = emptyList()
+    private var user : NewUser? = null
+    private var code : String = ""
 
     override fun onAttach(context: Context) {
         context.appComponent.injectListFragment(this)
@@ -47,36 +43,35 @@ class ListFragmentNew : Fragment() {
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         checkBundle()
+        binding.cod1c.text = this.code
         binding.recyclerMama.layoutManager = LinearLayoutManager(requireContext())
 
-        val listWithData: MutableList<CardEntity> = mutableListOf()
         lifecycleScope.launch {
-            listWithData.clear()
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.CREATED){
-                viewModel.getFlowListData(list).collect {
-                    listWithData.add(it)
-                }
+                viewModel.startWorking(code)
             }
         }
 
-        lifecycleScope.launch {
-            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED){
-                binding.recyclerMama.adapter = Adapter(listWithData, user!!){card, user ->
-                    this@ListFragmentNew.activity?.supportFragmentManager?.beginTransaction()
-                        ?.replace(R.id.mainFrameLayout, CardFragmentNew.newInstance(bundle = Bundle().apply {
-                            putInt("index",card.index)
-                            putParcelable("user",user)
-                        }))
-                        ?.addToBackStack("list")
-                        ?.commit()
-                }
+        viewModel.publicData.observe(viewLifecycleOwner) {
+            binding.recyclerMama.adapter = Adapter(
+                viewModel.publicData.value?.toMutableList() ?: mutableListOf()
+                , user!!){ card, user ->
+                this@ListFragmentNew.activity?.supportFragmentManager?.beginTransaction()
+                    ?.replace(R.id.mainFrameLayout, CardFragmentNew.newInstance(bundle = Bundle().apply {
+                        putParcelable("user",user)
+                        putInt("cardIndex",card.index).also{
+                            Log.d("Index","index from recyclerView = ${card.index}")
+                        }
+                    }))
+                    ?.addToBackStack("list")
+                    ?.commit()
             }
         }
     }
@@ -90,7 +85,8 @@ class ListFragmentNew : Fragment() {
         try {
             if(this.arguments != null) {
                 user = arguments?.getParcelable("user")
-                list = arguments?.getIntegerArrayList("list")!!.toList()
+                list = arguments?.getIntArray("indexArray")!!.toList()
+                code = arguments?.getString("Code1c") ?: ""
             }
         }
         catch (e : NullPointerException) {
@@ -101,9 +97,9 @@ class ListFragmentNew : Fragment() {
 
 companion object {
     fun newInstance(bundle : Bundle) : ListFragmentNew {
-        val fra = ListFragmentNew()
-        fra.arguments = bundle
-        return fra
+        return ListFragmentNew().apply {
+            arguments = bundle
+        }
     }
 }
 }

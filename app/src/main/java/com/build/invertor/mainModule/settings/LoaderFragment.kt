@@ -19,11 +19,8 @@ import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import com.build.Invertor.R
-import com.build.invertor.mainModule.application.App
 import com.build.invertor.mainModule.application.appComponent
 import com.build.invertor.mainModule.viewModelFactory.DaggerViewModelFactory
-import com.build.invertor.model.database.data.UserEntity
-import com.build.invertor.model.modelOld.json.csv.DataDownloader
 import java.io.*
 import javax.inject.Inject
 

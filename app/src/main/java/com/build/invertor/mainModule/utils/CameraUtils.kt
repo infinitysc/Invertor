@@ -2,7 +2,6 @@ package com.build.invertor.mainModule.utils
 
 import com.build.invertor.model.database.card.CardEntity
 import com.build.invertor.model.database.card.Codes
-import com.build.invertor.model.modelOld.json.json.CardInventory
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow

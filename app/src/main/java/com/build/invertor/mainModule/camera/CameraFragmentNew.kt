@@ -8,47 +8,27 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.AutoCompleteTextView
-import android.widget.Button
-import android.widget.EditText
-import android.widget.ImageView
-import android.widget.LinearLayout
-import android.widget.TextView
 import android.widget.Toast
-import androidx.appcompat.widget.SwitchCompat
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.layout.Layout
+import androidx.core.text.isDigitsOnly
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.build.Invertor.R
 import com.build.Invertor.databinding.NewCameraFragmentLayoutBinding
-import com.build.invertor.mainModule.Card.CardFragmentNew
-import com.build.invertor.mainModule.application.App
+import com.build.invertor.mainModule.card.CardFragmentNew
 import com.build.invertor.mainModule.application.appComponent
-import com.build.invertor.mainModule.oldFragments.ListChoiceFragment
 import com.build.invertor.mainModule.listFragment.ListFragmentNew
-import com.build.invertor.mainModule.oldFragments.CameraController
 import com.build.invertor.mainModule.utils.CameraUtils
 import com.build.invertor.mainModule.viewModelFactory.DaggerViewModelFactory
 import com.build.invertor.model.database.card.CardEntity
-import com.build.invertor.model.database.card.Codes
 import com.build.invertor.model.modelOld.json.csv.NewUser
-import com.build.invertor.model.modelOld.json.json.CardInventory
-import com.google.zxing.BarcodeFormat
 import com.journeyapps.barcodescanner.BarcodeCallback
-import com.journeyapps.barcodescanner.BarcodeView
 import com.journeyapps.barcodescanner.DefaultDecoderFactory
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import javax.inject.Inject
 
 class CameraFragmentNew : Fragment(){
@@ -62,7 +42,6 @@ class CameraFragmentNew : Fragment(){
 
     private var codes : List<String> = emptyList()
 
-
     @Inject
     lateinit var factory : DaggerViewModelFactory
 
@@ -70,7 +49,6 @@ class CameraFragmentNew : Fragment(){
 
     private val viewModel : CameraViewModel by viewModels { factory }
 
-    private lateinit var controller: CameraController
 
     private val sound : MediaPlayer by lazy { MediaPlayer.create(requireContext(), R.raw.scanner_beep) }
     private var valueString : String = "defaultStringValue"
@@ -118,6 +96,7 @@ class CameraFragmentNew : Fragment(){
         }
 
         Log.i("CODES","$codes")
+
         viewModel.valueString.observe(viewLifecycleOwner) {
             if(it != "" || it != "defaultValue") {
                 viewModel.createFlowData(it)
@@ -133,11 +112,14 @@ class CameraFragmentNew : Fragment(){
             }
         }
 
-
         binding.userValue.text = user!!.user?.userName
+
         binding.barcodeView.decoderFactory = DefaultDecoderFactory(viewModel.formats)
+
         binding.barcodeView.decodeContinuous(callback)
+
         binding.testCard.text = "${user!!.user},${user!!.adress},${user!!.cabinet}"
+
     }
 
     override fun onStart() {
@@ -180,14 +162,32 @@ class CameraFragmentNew : Fragment(){
         }
     }
 
+    override fun onPause() {
+        super.onPause()
+        binding.barcodeView.pause()
+        valueString = "defaultStringValue"
+
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        sound.release()
+    }
+
+
     private fun startCardFragment(card : List<CardEntity>) {
         Log.d("NEXT","$card, $user")
-        val bundle = createBundle(this.user!!,card[0].index)
+        val bundle = Bundle().apply {
+            putParcelable("user",user)
+            putInt("cardIndex",card[0].index)
+        }
         requireActivity().supportFragmentManager.beginTransaction()
             .replace(R.id.mainFrameLayout, CardFragmentNew.newInstance(bundle))
             .addToBackStack("papa")
             .commit()
     }
+
+
 
     private fun startListFragment(card : List<CardEntity>) {
         val newIndexList : () -> List<Int> = {
@@ -198,17 +198,18 @@ class CameraFragmentNew : Fragment(){
             list
         }
 
-        val bundle = Bundle()
-        bundle.putParcelable("user",user)
-        bundle.putIntArray("indexArray",newIndexList.invoke().toIntArray())
-        useToast("Обьектов найдено ${card.size}")
-        runBlocking {
-            delay(1000)
+        val bundle = Bundle().apply {
+            putParcelable("user",user!!)
+            putString("Code1c",valueString)
+            putIntArray("indexArray",newIndexList.invoke().toIntArray())
         }
+
+        Log.d("StartListFragment","${bundle.size()}")
+
         requireActivity().supportFragmentManager.beginTransaction()
             .replace(R.id.mainFrameLayout, ListFragmentNew.newInstance(bundle))
-            .addToBackStack("camera")
-            .commit()
+            //.addToBackStack("camera")
+            .commitNow()
 
     }
 
@@ -234,12 +235,7 @@ class CameraFragmentNew : Fragment(){
             .create()
     }
 
-    private fun createBundle(user : NewUser,cardIndex : Int) : Bundle {
-        return Bundle().apply {
-            putParcelable("user",user)
-            putInt("cardIndex",cardIndex)
-        }
-    }
+
 
     private fun useToast(text : String) {
         Toast.makeText(requireContext(),text, Toast.LENGTH_SHORT).show()
